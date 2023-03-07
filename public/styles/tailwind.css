@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+/* Use for base HTML styles (h1, p, a, etc.) */
+@layer base {
+
+}
+
+/* Use for component classes (buttons, cards, etc.) */
+@layer components {
+
+}
+
+/* Use for utility classes (margin, padding, etc.) */
+@layer utilities {
+
+}
