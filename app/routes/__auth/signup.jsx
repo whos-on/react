@@ -1,5 +1,5 @@
 import { json } from "@remix-run/cloudflare"
-import { Key, Mail } from "lucide-react"
+import { Key, Mail, User } from "lucide-react"
 import AuthScreen from "~/components/AuthScreen"
 
 export const action = async () => {
@@ -15,6 +15,12 @@ export default function Signup() {
                 text: "log into your account"
             }}
             formFields={[
+                {
+                    name: "firstname", type: "text", label: "First Name", icon: User, validator: () => true
+                },
+                {
+                    name: "lastname", type: "text", label: "Last Name", icon: User, validator: () => true
+                },
                 {
                     name: "email", type: "email", label: "Email", icon: Mail, validator: () => true
                 }, {
