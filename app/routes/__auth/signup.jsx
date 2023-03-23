@@ -1,4 +1,5 @@
 import { json } from "@remix-run/cloudflare"
+import { Key, Mail } from "lucide-react"
 import AuthScreen from "~/components/AuthScreen"
 
 export const action = async () => {
@@ -15,9 +16,9 @@ export default function Signup() {
             }}
             formFields={[
                 {
-                    name: "email", type: "email", label: "Email", validator: () => true
+                    name: "email", type: "email", label: "Email", icon: Mail, validator: () => true
                 }, {
-                    name: "password", type: "password", label: "Password", validator: () => true
+                    name: "password", type: "password", label: "Password", icon: Key, validator: () => true
                 }
             ]}
             submitText="Sign up"

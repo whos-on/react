@@ -6,7 +6,9 @@
 
 /* Use for base HTML styles (h1, p, a, etc.) */
 @layer base {
-
+    * {
+        @apply transition-all;
+    }
 }
 
 /* Use for component classes (buttons, cards, etc.) */

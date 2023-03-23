@@ -1,12 +1,12 @@
 import { json } from "@remix-run/cloudflare"
 import { Form } from "@remix-run/react"
-import Footer from "~/components/common/Footer"
+
 
 export const action = async () => {
     return json({ message: "Hello World" }) // TODO: Construct form data and hand off to API
 }
 
-export default function AuthScreen({title, alt, formFields, submitText}) {
+export default function AuthScreen({ title, alt, formFields, submitText }) {
     return (
         <div className="flex flex-col min-h-screen h-full w-full bg-[url('/images/authbg.png')] bg-no-repeat bg-cover">
             <div className="flex flex-col min-h-screen h-full w-full max-h-screen bg-black bg-opacity-40">
@@ -15,22 +15,28 @@ export default function AuthScreen({title, alt, formFields, submitText}) {
                     <a href="/" className="text-gray-900 text-sm font-sans font-medium opacity-80 hover:opacity-100 mx-auto">← Back</a>
 
                     <div className="flex flex-col my-auto">
-                        <img src="/images/wo_logo_green_nobg_653x100.svg" alt="Who's On? Logo" className="mx-auto mb-8 w-28"/>
-                        <h1 className="text-3xl font-extrabold font-sans tracking-tight text-center">{title}</h1>
-                        <p className="w-full text-center">Or <a className="text-primary" href={alt.link}>{ alt.text }</a></p>
+                        <img src="/images/wo_logo_green_nobg_653x100.svg" alt="Who's On? Logo" className="mx-auto mb-8 w-28" />
+                        <h1 className="text-3xl font-extrabold font-sans tracking-tight text-center text-gray-900">{title}</h1>
+                        <p className="w-full text-center text-gray-900/80">Or <a className="text-primary/80 hover:text-primary/100" href={alt.link}>{alt.text}</a></p>
 
                         <Form method="post" className="mt-8 flex flex-col space-y-4">
-                            {formFields.map(({ name, type, label, validator }) => (
-                                <input
-                                    className="border border-gray-300 rounded-md p-2"
-                                    type={type}
-                                    name={name}
-                                    id={name}
-                                    key={name}
-                                    placeholder={label}
-                                />
-                            ))}
-                            <button className="bg-gradient-to-tr from-primary to-secondary text-white rounded-md p-2" type="submit">{ submitText }</button>
+                            {formFields.map(({ name, type, label, validator, icon }) => {
+                                let Icon = icon
+                                return (
+                                    <div key={name} className="w-full flex flex-row relative">
+                                        <Icon className="absolute inset-y-0 left-0 ml-3.5 pointer-events-none w-4 h-4 text-gray-900/50 my-auto mr-2" />
+                                        <input
+                                            className="w-full border border-gray-300 rounded-lg py-2 pl-10 pr-5 bg-gray-50 text-gray-900/90 focus:border-primary focus:ring-1 focus:outline-none focus:ring-primary font-medium font-sans text-sm"
+                                            type={type}
+                                            name={name}
+                                            id={name}
+                                            placeholder={label}
+                                        />
+                                    </div>
+                                )
+                            })}
+                            <button className="bg-gradient-to-tr from-primary to-secondary text-white rounded-md p-2" type="submit">{submitText}</button>
+                            <p className="font-sans font-medium text-2xs text-gray-900/50 mx-auto pt-2">By signing up, you agree to our <a href="/tos" className="underline">Terms and Conditions</a></p>
                         </Form>
 
                     </div>
