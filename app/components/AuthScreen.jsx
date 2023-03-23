@@ -36,7 +36,6 @@ export default function AuthScreen({title, alt, formFields, submitText}) {
                     </div>
 
                 </div>
-                <Footer/>
             </div>
         </div>
     )
