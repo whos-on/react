@@ -1,9 +1,14 @@
 export default function NavigationBar() {
     return (
-        <nav className="flex flex-row justify-between items-center py-2 px-6 rounded-full mx-5 my-3 bg-gray-50 ring-1 ring-gray-700 ring-opacity-20 shadow-lg">
-            <a href="/"><img className="mx-auto h-4 w-auto my-2" src="/images/wo_logo_green_nobg_653x100.svg" alt="logo" /></a>
-            <div className="rounded-full h-6 w-6 bg-[url('/images/sample_pfp.jpeg')] bg-cover">
-            </div>
+        <nav className="mx-5 my-3 flex flex-row items-center justify-between rounded-full bg-gray-50 py-2 px-6 shadow-lg ring-1 ring-gray-700 ring-opacity-20">
+            <a href="/">
+                <img
+                    className="mx-auto my-2 h-4 w-auto"
+                    src="/images/wo_logo_green_nobg_653x100.svg"
+                    alt="logo"
+                />
+            </a>
+            <div className="h-6 w-6 rounded-full bg-[url('/images/sample_pfp.jpeg')] bg-cover"></div>
         </nav>
     )
 }
