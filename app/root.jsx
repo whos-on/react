@@ -10,7 +10,16 @@ export const meta = () => ({
     viewport: "width=device-width,initial-scale=1",
 })
 
-export const links = () => [{ rel: "stylesheet", href: stylesheet }]
+export const links = () => [
+    { rel: "stylesheet", href: stylesheet },
+    {
+        rel: "preload",
+        as: "font",
+        href: "/fonts/Inter.ttf",
+        type: "font/ttf",
+        crossOrigin: "anonymous",
+    },
+]
 
 export default function App() {
     return (
