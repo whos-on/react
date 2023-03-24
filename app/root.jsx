@@ -1,3 +1,4 @@
+import { json } from "@remix-run/cloudflare"
 import {
     Links,
     LiveReload,
@@ -24,6 +25,11 @@ export default function App() {
     return (
         <html lang="en">
             <head>
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `window.env = ${ JSON.stringify(global.env) }`,
+                    }}
+                />
                 <Meta />
                 <Links />
             </head>
