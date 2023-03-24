@@ -70,7 +70,7 @@ export default function Signup() {
         <AuthScreen
             title="Create a new account"
             alt={{
-                link: "/auth/login",
+                link: "/login",
                 text: "log into your account",
             }}
             formFields={[
