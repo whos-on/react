@@ -73,7 +73,7 @@ export default function AuthScreen({ title, alt, formFields, submitText }) {
                                 {submitDisabled ? formError.message : submitText}
                             </button>
                             <p className="mx-auto pt-2 font-sans text-2xs font-medium text-gray-900/50">
-                                By signing up, you agree to our{" "}
+                                By authenticating, you agree to our{" "}
                                 <a href="/tos" className="underline">
                                     Terms and Conditions
                                 </a>
