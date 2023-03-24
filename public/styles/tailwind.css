@@ -16,8 +16,27 @@
 
 /* Use for component classes (buttons, cards, etc.) */
 @layer components {
+    .section-header {
+        @apply bg-gradient-multi bg-clip-text;
+    }
 }
 
 /* Use for utility classes (margin, padding, etc.) */
 @layer utilities {
+    .bg-gradient-multi {
+        background: linear-gradient(
+                to top right,
+                theme(colors.primary / 80%),
+                theme(colors.primary / 0%),
+                theme(colors.gray.900)
+            ),
+            linear-gradient(
+                to top left,
+                theme(colors.secondary / 100%),
+                theme(colors.gray.900),
+                theme(colors.gray.900)
+            ),
+            theme(colors.primary);
+        @apply bg-clip-text;
+    }
 }
