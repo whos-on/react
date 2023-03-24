@@ -1,5 +1,6 @@
 import { json } from "@remix-run/cloudflare"
-import { Form } from "@remix-run/react"
+import { Form, useActionData } from "@remix-run/react"
+import { useEffect, useState } from "react"
 
 
 export const action = async () => {
@@ -7,6 +8,15 @@ export const action = async () => {
 }
 
 export default function AuthScreen({ title, alt, formFields, submitText }) {
+    let formError = useActionData()
+    const [submitDisabled, setSubmitDisabled] = useState(false)
+
+    useEffect(() => {
+        if (formError) {
+            setSubmitDisabled(true)
+        }
+    }, [formError])
+
     return (
         <div className="flex flex-col min-h-screen h-full w-full bg-[url('/images/authbg.png')] bg-no-repeat bg-cover">
             <div className="flex flex-col min-h-screen h-full w-full max-h-screen bg-black bg-opacity-40">
@@ -31,11 +41,17 @@ export default function AuthScreen({ title, alt, formFields, submitText }) {
                                             name={name}
                                             id={name}
                                             placeholder={label}
+                                            onChange={(e) => {
+                                                setSubmitDisabled(false)
+                                            }}
                                         />
                                     </div>
                                 )
                             })}
-                            <button className="bg-gradient-to-tr from-primary to-secondary text-white rounded-md p-2" type="submit">{submitText}</button>
+                            <button disabled={submitDisabled} className={"text-white rounded-md p-2 " + (submitDisabled ?
+                                "cursor-not-allowed bg-red-500/40" :
+                                "bg-primary/100 hover:bg-primary/80"
+                            )} type="submit">{submitDisabled? formError.message : submitText}</button>
                             <p className="font-sans font-medium text-2xs text-gray-900/50 mx-auto pt-2">By signing up, you agree to our <a href="/tos" className="underline">Terms and Conditions</a></p>
                         </Form>
 
