@@ -3,7 +3,7 @@ import { createCookie } from "@remix-run/cloudflare"
 const apiError = (req, msg) => {
     return {
         data: null,
-        error: new Error(msg),
+        error: new Error(typeof msg === "string" ? msg : msg.error),
         status: req?.status || 500,
     }
 }
@@ -16,6 +16,7 @@ const apiSuccess = (req, data) => {
     }
 }
 
+//!: Bad practice... should use session cookies instead but too lazy tbh
 export const userCookie = () =>
     createCookie("wo_uid", {
         maxAge: 604800,
@@ -43,7 +44,7 @@ export default {
             })
 
             if (req.status >= 500) return apiError(req, "Server error")
-            else if (req.status == 400) return apiError(req, "User already exists")
+            else if (req.status == 400) return apiError(req, await req.json())
             else if (req.status == 201) return apiSuccess(req, null)
             else return apiError(req, "Unknown error")
         },

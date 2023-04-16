@@ -1,5 +1,5 @@
 import { json, redirect } from "@remix-run/cloudflare"
-import { Key, Mail, User } from "lucide-react"
+import { Key, Mail, Smile, User } from "lucide-react"
 import AuthScreen from "~/components/AuthScreen"
 import whoson, { userCookie } from "~/utils/whoson"
 
@@ -19,6 +19,7 @@ export const action = async ({ request }) => {
     if (!signupForm) return json({ message: "Missing all required fields" }, { status: 400 })
 
     let signupJSON = {
+        username: signupForm.get("username") || null,
         email: signupForm.get("email") || null,
         password: signupForm.get("password") || null,
         firstName: signupForm.get("first_name") || null,
@@ -27,6 +28,7 @@ export const action = async ({ request }) => {
 
     // Dynamically generate error message
     let signupErrors = []
+    if (!signupJSON.username) signupErrors.push("username")
     if (!signupJSON.email) signupErrors.push("email")
     if (!signupJSON.password) signupErrors.push("password")
     if (!signupJSON.firstName) signupErrors.push("first name")
@@ -40,20 +42,14 @@ export const action = async ({ request }) => {
         return json({ message: `Missing ${signupErrors[0]}` }, { status: 400 })
     }
 
-    // Generate username
-    // TODO: Backend should generate this
-    signupJSON.username =
-        signupJSON.firstName.toLowerCase() +
-        signupJSON.lastName.toLowerCase() +
-        Math.floor(Math.random() * 1000)
-
     // Attempt to register
     let { error: signupReqErr } = await whoson.user.register(signupJSON)
-    if (signupReqErr) return json({ message: signupReqErr.message }, { status: 400 })
+    if (signupReqErr)
+        return json({ message: signupReqErr.message }, { status: signupReqErr.status })
 
     // Login now
     let { data: loginReq, error: loginReqErr } = await whoson.user.login(signupJSON)
-    if (loginReqErr) return json({ message: loginReqErr.message }, { status: 400 })
+    if (loginReqErr) return json({ message: loginReqErr.message }, { status: loginReqErr.status })
 
     let { id: userID } = loginReq
 
@@ -86,6 +82,13 @@ export default function Signup() {
                     type: "text",
                     label: "Last Name*",
                     icon: User,
+                    validator: () => true,
+                },
+                {
+                    name: "username",
+                    type: "text",
+                    label: "Username*",
+                    icon: Smile,
                     validator: () => true,
                 },
                 {

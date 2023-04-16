@@ -35,7 +35,7 @@ export const action = async ({ request }) => {
 
     // Attempt to login
     let { data: loginReq, error: loginReqErr } = await whoson.user.login(loginJSON)
-    if (loginReqErr) return json({ message: loginReqErr.message }, { status: 400 })
+    if (loginReqErr) return json({ message: loginReqErr.message }, { status: loginReqErr.status })
 
     let { id: userID } = loginReq
 
