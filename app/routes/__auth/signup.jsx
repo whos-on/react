@@ -78,20 +78,22 @@ export default function Signup() {
 
     return (
         <AuthScreen title="Create a new account" altLink="/login" altText="log into your account">
-            <AuthInput
-                name="first_name"
-                type="text"
-                label="First Name*"
-                icon={User}
-                setSubmitDisabled={setSubmitDisabled}
-            />
-            <AuthInput
-                name="last_name"
-                type="text"
-                label="Last Name*"
-                icon={User}
-                setSubmitDisabled={setSubmitDisabled}
-            />
+            <div className="flex w-full flex-row space-x-4">
+                <AuthInput
+                    name="first_name"
+                    type="text"
+                    label="First Name*"
+                    icon={User}
+                    setSubmitDisabled={setSubmitDisabled}
+                />
+                <AuthInput
+                    name="last_name"
+                    type="text"
+                    label="Last Name*"
+                    icon={User}
+                    setSubmitDisabled={setSubmitDisabled}
+                />
+            </div>
             <AuthInput
                 name="username"
                 type="text"
