@@ -19,20 +19,20 @@ export const action = async ({ request }) => {
     if (!signupForm) return json({ message: "Missing all required fields" }, { status: 400 })
 
     let signupJSON = {
+        firstName: signupForm.get("first_name") || null,
+        lastName: signupForm.get("last_name") || null,
         username: signupForm.get("username") || null,
         email: signupForm.get("email") || null,
         password: signupForm.get("password") || null,
-        firstName: signupForm.get("first_name") || null,
-        lastName: signupForm.get("last_name") || null,
     }
 
     // Dynamically generate error message
     let signupErrors = []
+    if (!signupJSON.firstName) signupErrors.push("first name")
+    if (!signupJSON.lastName) signupErrors.push("last name")
     if (!signupJSON.username) signupErrors.push("username")
     if (!signupJSON.email) signupErrors.push("email")
     if (!signupJSON.password) signupErrors.push("password")
-    if (!signupJSON.firstName) signupErrors.push("first name")
-    if (!signupJSON.lastName) signupErrors.push("last name")
     if (signupErrors.length >= 3) {
         let last = signupErrors.pop()
         return json({ message: `Missing ${signupErrors.join(", ")} and ${last}` }, { status: 400 })
