@@ -9,14 +9,14 @@ import whoson, { userCookie } from "~/utils/whoson"
 
 export const loader = async ({ request }) => {
     // Check if user is already logged in and redirect to app
-    if ((await whoson.user.current(request)) != null) return redirect("/app")
+    if (await whoson.user.current(request)) return redirect("/app")
 
     return null
 }
 
 export const action = async ({ request }) => {
     // Check if user is already logged in and redirect to app
-    if ((await whoson.user.current(request)) != null) return redirect("/app")
+    if (await whoson.user.current(request)) return redirect("/app")
 
     // Grab form data and check that all fields are present
     const signupForm = await request?.formData()
