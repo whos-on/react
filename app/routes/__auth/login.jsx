@@ -1,6 +1,10 @@
 import { json, redirect } from "@remix-run/cloudflare"
-import { Key, Mail, User } from "lucide-react"
-import AuthScreen from "~/components/AuthScreen"
+import { useActionData } from "@remix-run/react"
+import { Key, Mail } from "lucide-react"
+import { useEffect, useState } from "react"
+import AuthScreen from "~/components/auth/AuthScreen"
+import AuthInput from "~/components/auth/AuthInput"
+import AuthSubmitButton from "~/components/auth/AuthSubmitButton"
 import whoson, { userCookie } from "~/utils/whoson"
 
 export const loader = async ({ request }) => {
@@ -48,30 +52,34 @@ export const action = async ({ request }) => {
 }
 
 export default function Login() {
+    let formError = useActionData()
+    const [submitDisabled, setSubmitDisabled] = useState(false)
+
+    useEffect(() => {
+        if (formError) {
+            setSubmitDisabled(true)
+        }
+    }, [formError])
+
     return (
-        <AuthScreen
-            title="Log in to your account"
-            alt={{
-                link: "/signup",
-                text: "create a new account",
-            }}
-            formFields={[
-                {
-                    name: "email",
-                    type: "email",
-                    label: "Email*",
-                    icon: Mail,
-                    validator: () => true,
-                },
-                {
-                    name: "password",
-                    type: "password",
-                    label: "Password*",
-                    icon: Key,
-                    validator: () => true,
-                },
-            ]}
-            submitText="Log in"
-        />
+        <AuthScreen title="Log in to your account" altLink="/signup" altText="create a new account">
+            <AuthInput
+                name="email"
+                type="email"
+                label="Email*"
+                icon={Mail}
+                setSubmitDisabled={setSubmitDisabled}
+            />
+            <AuthInput
+                name="password"
+                type="password"
+                label="Password*"
+                icon={Key}
+                setSubmitDisabled={setSubmitDisabled}
+            />
+            <AuthSubmitButton disabled={submitDisabled}>
+                {submitDisabled ? formError.message : "Log in"}
+            </AuthSubmitButton>
+        </AuthScreen>
     )
 }

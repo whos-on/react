@@ -1,6 +1,10 @@
 import { json, redirect } from "@remix-run/cloudflare"
+import { useActionData } from "@remix-run/react"
 import { Key, Mail, Smile, User } from "lucide-react"
-import AuthScreen from "~/components/AuthScreen"
+import { useEffect, useState } from "react"
+import AuthScreen from "~/components/auth/AuthScreen"
+import AuthInput from "~/components/auth/AuthInput"
+import AuthSubmitButton from "~/components/auth/AuthSubmitButton"
 import whoson, { userCookie } from "~/utils/whoson"
 
 export const loader = async ({ request }) => {
@@ -62,51 +66,56 @@ export const action = async ({ request }) => {
 }
 
 export default function Signup() {
+    let formError = useActionData()
+    const [submitDisabled, setSubmitDisabled] = useState(false)
+
+    useEffect(() => {
+        if (formError) {
+            console.log(formError)
+            setSubmitDisabled(true)
+        }
+    }, [formError])
+
     return (
-        <AuthScreen
-            title="Create a new account"
-            alt={{
-                link: "/login",
-                text: "log into your account",
-            }}
-            formFields={[
-                {
-                    name: "first_name",
-                    type: "text",
-                    label: "First Name*",
-                    icon: User,
-                    validator: () => true,
-                },
-                {
-                    name: "last_name",
-                    type: "text",
-                    label: "Last Name*",
-                    icon: User,
-                    validator: () => true,
-                },
-                {
-                    name: "username",
-                    type: "text",
-                    label: "Username*",
-                    icon: Smile,
-                    validator: () => true,
-                },
-                {
-                    name: "email",
-                    type: "email",
-                    label: "Email*",
-                    icon: Mail,
-                    validator: () => true,
-                },
-                {
-                    name: "password",
-                    type: "password",
-                    label: "Password*",
-                    icon: Key,
-                    validator: () => true,
-                },
-            ]}
-            submitText="Sign up"
-        />
+        <AuthScreen title="Create a new account" altLink="/login" altText="log into your account">
+            <AuthInput
+                name="first_name"
+                type="text"
+                label="First Name*"
+                icon={User}
+                setSubmitDisabled={setSubmitDisabled}
+            />
+            <AuthInput
+                name="last_name"
+                type="text"
+                label="Last Name*"
+                icon={User}
+                setSubmitDisabled={setSubmitDisabled}
+            />
+            <AuthInput
+                name="username"
+                type="text"
+                label="Username*"
+                icon={Smile}
+                setSubmitDisabled={setSubmitDisabled}
+            />
+            <AuthInput
+                name="email"
+                type="email"
+                label="Email*"
+                icon={Mail}
+                setSubmitDisabled={setSubmitDisabled}
+            />
+            <AuthInput
+                name="password"
+                type="password"
+                label="Password*"
+                icon={Key}
+                setSubmitDisabled={setSubmitDisabled}
+            />
+            <AuthSubmitButton disabled={submitDisabled}>
+                {submitDisabled ? formError.message : "Sign up"}
+            </AuthSubmitButton>
+        </AuthScreen>
     )
 }
