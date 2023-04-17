@@ -22,7 +22,7 @@ export const action = async ({ request }) => {
     const signupForm = await request?.formData()
     if (!signupForm) return json({ message: "Missing all required fields" }, { status: 400 })
 
-    let signupJSON = {
+    let signupPayload = {
         firstName: signupForm.get("first_name") || null,
         lastName: signupForm.get("last_name") || null,
         username: signupForm.get("username") || null,
@@ -31,36 +31,36 @@ export const action = async ({ request }) => {
     }
 
     // Dynamically generate error message
-    let signupErrors = []
-    if (!signupJSON.firstName) signupErrors.push("first name")
-    if (!signupJSON.lastName) signupErrors.push("last name")
-    if (!signupJSON.username) signupErrors.push("username")
-    if (!signupJSON.email) signupErrors.push("email")
-    if (!signupJSON.password) signupErrors.push("password")
-    if (signupErrors.length >= 3) {
-        let last = signupErrors.pop()
-        return json({ message: `Missing ${signupErrors.join(", ")} and ${last}` }, { status: 400 })
-    } else if (signupErrors.length == 2) {
-        return json({ message: `Missing ${signupErrors.join(" and ")}` }, { status: 400 })
-    } else if (signupErrors.length == 1) {
-        return json({ message: `Missing ${signupErrors[0]}` }, { status: 400 })
+    let signupFormErrors = []
+    if (!signupPayload.firstName) signupFormErrors.push("first name")
+    if (!signupPayload.lastName) signupFormErrors.push("last name")
+    if (!signupPayload.username) signupFormErrors.push("username")
+    if (!signupPayload.email) signupFormErrors.push("email")
+    if (!signupPayload.password) signupFormErrors.push("password")
+    if (signupFormErrors.length >= 3) {
+        let last = signupFormErrors.pop()
+        return json(
+            { message: `Missing ${signupFormErrors.join(", ")} and ${last}` },
+            { status: 400 }
+        )
+    } else if (signupFormErrors.length == 2) {
+        return json({ message: `Missing ${signupFormErrors.join(" and ")}` }, { status: 400 })
+    } else if (signupFormErrors.length == 1) {
+        return json({ message: `Missing ${signupFormErrors[0]}` }, { status: 400 })
     }
 
     // Attempt to register
-    let { error: signupReqErr } = await whoson.user.register(signupJSON)
-    if (signupReqErr)
-        return json({ message: signupReqErr.message }, { status: signupReqErr.status })
+    let { error: signupErr } = await whoson.user.register(signupPayload)
+    if (signupErr) return json({ message: signupErr.message }, { status: signupErr.status })
 
     // Login now
-    let { data: loginReq, error: loginReqErr } = await whoson.user.login(signupJSON)
-    if (loginReqErr) return json({ message: loginReqErr.message }, { status: loginReqErr.status })
-
-    let { id: userID } = loginReq
+    let { data: loginRes, error: loginErr } = await whoson.user.login(signupPayload)
+    if (loginErr) return json({ message: loginErr.message }, { status: loginErr.status })
 
     // Set cookie and redirect to app
     throw redirect("/app", {
         headers: {
-            "Set-Cookie": await userCookie().serialize(userID),
+            "Set-Cookie": await userCookie().serialize(loginRes),
         },
     })
 }

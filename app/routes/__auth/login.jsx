@@ -22,31 +22,29 @@ export const action = async ({ request }) => {
     const loginForm = await request?.formData()
     if (!loginForm) return json({ message: "Missing all required fields" }, { status: 400 })
 
-    let loginJSON = {
+    let loginPayload = {
         email: loginForm.get("email") || null,
         password: loginForm.get("password") || null,
     }
 
     // Dynamically generate error message
-    let loginErrors = []
-    if (!loginJSON.email) loginErrors.push("email")
-    if (!loginJSON.password) loginErrors.push("password")
-    if (loginErrors.length == 2) {
-        return json({ message: `Missing ${loginErrors.join(" and ")}` }, { status: 400 })
-    } else if (loginErrors.length == 1) {
-        return json({ message: `Missing ${loginErrors[0]}` }, { status: 400 })
+    let loginFormErrors = []
+    if (!loginPayload.email) loginFormErrors.push("email")
+    if (!loginPayload.password) loginFormErrors.push("password")
+    if (loginFormErrors.length == 2) {
+        return json({ message: `Missing ${loginFormErrors.join(" and ")}` }, { status: 400 })
+    } else if (loginFormErrors.length == 1) {
+        return json({ message: `Missing ${loginFormErrors[0]}` }, { status: 400 })
     }
 
     // Attempt to login
-    let { data: loginReq, error: loginReqErr } = await whoson.user.login(loginJSON)
-    if (loginReqErr) return json({ message: loginReqErr.message }, { status: loginReqErr.status })
-
-    let { id: userID } = loginReq
+    let { data: loginRes, error: loginErr } = await whoson.user.login(loginPayload)
+    if (loginErr) return json({ message: loginErr.message }, { status: loginErr.status })
 
     // Set cookie and redirect to app
     throw redirect("/app", {
         headers: {
-            "Set-Cookie": await userCookie().serialize(userID),
+            "Set-Cookie": await userCookie().serialize(loginRes),
         },
     })
 }
