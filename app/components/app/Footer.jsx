@@ -1,6 +1,6 @@
 export default function Footer() {
     return (
-        <footer className="max-w-screen min-w-screen absolute bottom-0 left-0 right-0 z-40 flex w-full flex-row items-center overflow-hidden bg-gray-50 py-0.5 px-2 text-2xs shadow-lg ring-1 ring-gray-700 ring-opacity-20">
+        <footer className="max-w-screen min-w-screen relative bottom-0 left-0 right-0 z-40 flex w-full flex-row items-center overflow-hidden bg-gray-50 py-0.5 px-2 text-2xs shadow-lg ring-1 ring-gray-700 ring-opacity-20">
             {[
                 { name: "About", href: "/about" },
                 { name: "Terms of Service", href: "/terms" },

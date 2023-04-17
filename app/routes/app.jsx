@@ -3,7 +3,7 @@ import NavigationBar from "~/components/common/NavigationBar"
 import whoson from "~/utils/whoson"
 import Map, { useMap } from "react-map-gl"
 import Footer from "~/components/app/Footer"
-import { useLoaderData } from "@remix-run/react"
+import { Outlet, useLoaderData } from "@remix-run/react"
 import { useState } from "react"
 
 export const loader = async ({ request }) => {
@@ -27,7 +27,6 @@ export default function WhosOnApp() {
 
     return (
         <div className="flex h-screen max-h-full min-h-full w-screen min-w-full max-w-full flex-shrink flex-grow overflow-hidden">
-            <NavigationBar user={user} />
             {/* <button
                 onClick={() => {
                     window.location.href = "/logout"
@@ -54,8 +53,15 @@ export default function WhosOnApp() {
                     }}
                     cursor={mapCursor}
                 />
+                <div className="absolute top-0 left-0 right-0 bottom-0 z-40 flex h-screen max-h-screen w-screen max-w-full flex-col">
+                    <NavigationBar user={user} />
+
+                    <div className="mx-5 mb-3 flex h-full w-1/4 flex-col rounded-xl bg-gray-50 px-6 py-4 shadow-lg ring-1 ring-gray-700 ring-opacity-20 ">
+                        <Outlet />
+                    </div>
+                    <Footer />
+                </div>
             </div>
-            <Footer />
         </div>
     )
 }
