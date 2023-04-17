@@ -11,9 +11,9 @@ export default function NavigationBar({ user }) {
                 />
             </a>
             <div
-                className="flex h-6 w-6 select-none rounded-full"
+                className="flex h-7 w-7 select-none rounded-full"
                 style={{ backgroundColor: userToBgColor(user) }}>
-                <div className="m-auto flex items-center text-center font-sans text-xs font-medium text-gray-50">
+                <div className="m-auto flex items-center text-center font-sans text-xs font-semibold text-gray-50">
                     {user?.firstName?.[0] + user?.lastName?.[0]}
                 </div>
             </div>
