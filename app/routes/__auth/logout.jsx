@@ -7,7 +7,7 @@ const handler = async request => {
 
     throw redirect("/", {
         headers: {
-            "Set-Cookie": await userCookie().serialize("", { maxAge: -1 }),
+            "Set-Cookie": await userCookie().serialize({}, { maxAge: -1 }),
         },
     })
 }

@@ -1,109 +1,120 @@
 import { json, redirect } from "@remix-run/cloudflare"
-import { Key, Mail, User } from "lucide-react"
-import AuthScreen from "~/components/AuthScreen"
+import { useActionData } from "@remix-run/react"
+import { Key, Mail, Smile, User } from "lucide-react"
+import { useEffect, useState } from "react"
+import AuthScreen from "~/components/auth/AuthScreen"
+import AuthInput from "~/components/auth/AuthInput"
+import AuthSubmitButton from "~/components/auth/AuthSubmitButton"
 import whoson, { userCookie } from "~/utils/whoson"
 
 export const loader = async ({ request }) => {
     // Check if user is already logged in and redirect to app
-    if ((await whoson.user.current(request)) != null) return redirect("/app")
+    if (await whoson.user.current(request)) return redirect("/app")
 
     return null
 }
 
 export const action = async ({ request }) => {
     // Check if user is already logged in and redirect to app
-    if ((await whoson.user.current(request)) != null) return redirect("/app")
+    if (await whoson.user.current(request)) return redirect("/app")
 
     // Grab form data and check that all fields are present
     const signupForm = await request?.formData()
     if (!signupForm) return json({ message: "Missing all required fields" }, { status: 400 })
 
-    let signupJSON = {
-        email: signupForm.get("email") || null,
-        password: signupForm.get("password") || null,
+    let signupPayload = {
         firstName: signupForm.get("first_name") || null,
         lastName: signupForm.get("last_name") || null,
+        username: signupForm.get("username") || null,
+        email: signupForm.get("email") || null,
+        password: signupForm.get("password") || null,
     }
 
     // Dynamically generate error message
-    let signupErrors = []
-    if (!signupJSON.email) signupErrors.push("email")
-    if (!signupJSON.password) signupErrors.push("password")
-    if (!signupJSON.firstName) signupErrors.push("first name")
-    if (!signupJSON.lastName) signupErrors.push("last name")
-    if (signupErrors.length >= 3) {
-        let last = signupErrors.pop()
-        return json({ message: `Missing ${signupErrors.join(", ")} and ${last}` }, { status: 400 })
-    } else if (signupErrors.length == 2) {
-        return json({ message: `Missing ${signupErrors.join(" and ")}` }, { status: 400 })
-    } else if (signupErrors.length == 1) {
-        return json({ message: `Missing ${signupErrors[0]}` }, { status: 400 })
+    let signupFormErrors = []
+    if (!signupPayload.firstName) signupFormErrors.push("first name")
+    if (!signupPayload.lastName) signupFormErrors.push("last name")
+    if (!signupPayload.username) signupFormErrors.push("username")
+    if (!signupPayload.email) signupFormErrors.push("email")
+    if (!signupPayload.password) signupFormErrors.push("password")
+    if (signupFormErrors.length >= 3) {
+        let last = signupFormErrors.pop()
+        return json(
+            { message: `Missing ${signupFormErrors.join(", ")} and ${last}` },
+            { status: 400 }
+        )
+    } else if (signupFormErrors.length == 2) {
+        return json({ message: `Missing ${signupFormErrors.join(" and ")}` }, { status: 400 })
+    } else if (signupFormErrors.length == 1) {
+        return json({ message: `Missing ${signupFormErrors[0]}` }, { status: 400 })
     }
 
-    // Generate username
-    // TODO: Backend should generate this
-    signupJSON.username =
-        signupJSON.firstName.toLowerCase() +
-        signupJSON.lastName.toLowerCase() +
-        Math.floor(Math.random() * 1000)
-
     // Attempt to register
-    let { error: signupReqErr } = await whoson.user.register(signupJSON)
-    if (signupReqErr) return json({ message: signupReqErr.message }, { status: 400 })
+    let { error: signupErr } = await whoson.user.register(signupPayload)
+    if (signupErr) return json({ message: signupErr.message }, { status: signupErr.status })
 
     // Login now
-    let { data: loginReq, error: loginReqErr } = await whoson.user.login(signupJSON)
-    if (loginReqErr) return json({ message: loginReqErr.message }, { status: 400 })
-
-    let { id: userID } = loginReq
+    let { data: loginRes, error: loginErr } = await whoson.user.login(signupPayload)
+    if (loginErr) return json({ message: loginErr.message }, { status: loginErr.status })
 
     // Set cookie and redirect to app
     throw redirect("/app", {
         headers: {
-            "Set-Cookie": await userCookie().serialize(userID),
+            "Set-Cookie": await userCookie().serialize(loginRes),
         },
     })
 }
 
 export default function Signup() {
+    let formError = useActionData()
+    const [submitDisabled, setSubmitDisabled] = useState(false)
+
+    useEffect(() => {
+        if (formError) setSubmitDisabled(true)
+    }, [formError])
+
     return (
-        <AuthScreen
-            title="Create a new account"
-            alt={{
-                link: "/login",
-                text: "log into your account",
-            }}
-            formFields={[
-                {
-                    name: "first_name",
-                    type: "text",
-                    label: "First Name*",
-                    icon: User,
-                    validator: () => true,
-                },
-                {
-                    name: "last_name",
-                    type: "text",
-                    label: "Last Name*",
-                    icon: User,
-                    validator: () => true,
-                },
-                {
-                    name: "email",
-                    type: "email",
-                    label: "Email*",
-                    icon: Mail,
-                    validator: () => true,
-                },
-                {
-                    name: "password",
-                    type: "password",
-                    label: "Password*",
-                    icon: Key,
-                    validator: () => true,
-                },
-            ]}
-            submitText="Sign up"
-        />
+        <AuthScreen title="Create a new account" altLink="/login" altText="log into your account">
+            <div className="flex w-full flex-row space-x-4">
+                <AuthInput
+                    name="first_name"
+                    type="text"
+                    label="First Name*"
+                    icon={User}
+                    setSubmitDisabled={setSubmitDisabled}
+                />
+                <AuthInput
+                    name="last_name"
+                    type="text"
+                    label="Last Name*"
+                    icon={User}
+                    setSubmitDisabled={setSubmitDisabled}
+                />
+            </div>
+            <AuthInput
+                name="username"
+                type="text"
+                label="Username*"
+                icon={Smile}
+                setSubmitDisabled={setSubmitDisabled}
+            />
+            <AuthInput
+                name="email"
+                type="email"
+                label="Email*"
+                icon={Mail}
+                setSubmitDisabled={setSubmitDisabled}
+            />
+            <AuthInput
+                name="password"
+                type="password"
+                label="Password*"
+                icon={Key}
+                setSubmitDisabled={setSubmitDisabled}
+            />
+            <AuthSubmitButton disabled={submitDisabled}>
+                {submitDisabled ? formError.message : "Sign up"}
+            </AuthSubmitButton>
+        </AuthScreen>
     )
 }
