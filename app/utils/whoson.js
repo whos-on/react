@@ -72,7 +72,6 @@ export default {
             const cookieHeader = req.headers.get("Cookie")
             if (!cookieHeader) return null
             let res = await userCookie().parse(cookieHeader)
-            console.log(res)
             return res || null
         },
     },

@@ -70,10 +70,7 @@ export default function Signup() {
     const [submitDisabled, setSubmitDisabled] = useState(false)
 
     useEffect(() => {
-        if (formError) {
-            console.log(formError)
-            setSubmitDisabled(true)
-        }
+        if (formError) setSubmitDisabled(true)
     }, [formError])
 
     return (
