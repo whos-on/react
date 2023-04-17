@@ -1,4 +1,4 @@
-import Footer from "~/components/common/Footer"
+import Footer from "~/components/app/Footer"
 import NavigationBar from "~/components/common/NavigationBar"
 
 export default function About() {

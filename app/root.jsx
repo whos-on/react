@@ -1,5 +1,12 @@
-import { json } from "@remix-run/cloudflare"
-import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react"
+import {
+    Links,
+    LiveReload,
+    Meta,
+    Outlet,
+    Scripts,
+    ScrollRestoration,
+    useLoaderData,
+} from "@remix-run/react"
 
 // TailwindCSS
 import stylesheet from "public/styles/tailwind.css"
@@ -21,13 +28,25 @@ export const links = () => [
     },
 ]
 
+export const loader = () => {
+    return {
+        env: {
+            WHOSON_API_URL: global.env.WHOSON_API_URL,
+            WORKER_ENV: global.env.WORKER_ENV,
+            MAPBOX_PUBLIC_ACCESS_TOKEN: global.env.MAPBOX_PUBLIC_ACCESS_TOKEN,
+        },
+    }
+}
+
 export default function App() {
+    let data = useLoaderData()
+
     return (
         <html lang="en">
             <head>
                 <script
                     dangerouslySetInnerHTML={{
-                        __html: `window.env = ${JSON.stringify(global.env)}`,
+                        __html: `window.env = ${JSON.stringify(data?.env || null)}`,
                     }}
                 />
                 <Meta />
