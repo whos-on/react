@@ -1,29 +1,40 @@
 import { redirect } from "@remix-run/cloudflare"
 import NavigationBar from "~/components/common/NavigationBar"
 import whoson from "~/utils/whoson"
-import Map from "react-map-gl"
+import Map, { useMap } from "react-map-gl"
 import Footer from "~/components/app/Footer"
+import { useLoaderData } from "@remix-run/react"
+import { useState } from "react"
 
 export const loader = async ({ request }) => {
     // Check if user isn't logged in
-    if (!(await whoson.user.current(request))) throw redirect("/login")
+    let user = await whoson.user.current(request)
+    if (!user) throw redirect("/login")
 
-    return null
+    return { user }
 }
 
 export default function WhosOnApp() {
+    const { user } = useLoaderData() || {}
+
+    const [mapCursor, setMapCursor] = useState("auto")
+
+    const map = useMap()
+
+    if (!user) throw new Error(`User is not logged in. (${user})`)
+
     const MAPBOX_PUBLIC_ACCESS_TOKEN = (global || window)?.env?.MAPBOX_PUBLIC_ACCESS_TOKEN
 
     return (
-        <div className="h-screen max-h-full min-h-full w-screen min-w-full max-w-full overflow-hidden">
-            <NavigationBar />
+        <div className="flex h-screen max-h-full min-h-full w-screen min-w-full max-w-full flex-shrink flex-grow overflow-hidden">
+            <NavigationBar user={user} />
             {/* <button
                 onClick={() => {
                     window.location.href = "/logout"
                 }}>
                 Log out
             </button> */}
-            <div className="h-full min-h-full w-full min-w-full">
+            <div className="flex h-screen min-h-full w-screen min-w-full flex-shrink flex-grow">
                 <Map
                     initialViewState={{
                         latitude: 28.6024,
@@ -35,6 +46,13 @@ export default function WhosOnApp() {
                     mapStyle="mapbox://styles/skyclo/clgk1iq1w00nn01lcmk8g6i1i"
                     className="h-full min-h-full w-full min-w-full"
                     attributionControl={false}
+                    onDragStart={() => {
+                        setMapCursor("grabbing")
+                    }}
+                    onDragEnd={() => {
+                        setMapCursor("auto")
+                    }}
+                    cursor={mapCursor}
                 />
             </div>
             <Footer />

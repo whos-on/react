@@ -1,4 +1,6 @@
-export default function NavigationBar() {
+import userToBgColor from "~/utils/userToBgColor"
+
+export default function NavigationBar({ user }) {
     return (
         <nav className="absolute top-0 left-0 right-0 z-40 mx-5 my-3 flex flex-row items-center justify-between rounded-full bg-gray-50 py-2 px-6 shadow-lg ring-1 ring-gray-700 ring-opacity-20">
             <a href="/">
@@ -8,7 +10,13 @@ export default function NavigationBar() {
                     alt="logo"
                 />
             </a>
-            <div className="h-6 w-6 rounded-full bg-[url('/images/sample_pfp.jpeg')] bg-cover"></div>
+            <div
+                className="flex h-6 w-6 select-none rounded-full"
+                style={{ backgroundColor: userToBgColor(user) }}>
+                <div className="m-auto flex items-center text-center font-sans text-xs font-medium text-gray-50">
+                    {user?.firstName?.[0] + user?.lastName?.[0]}
+                </div>
+            </div>
         </nav>
     )
 }

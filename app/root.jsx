@@ -52,7 +52,7 @@ export default function App() {
                 <Meta />
                 <Links />
             </head>
-            <body className="flex h-full min-h-screen w-full flex-col overflow-x-hidden">
+            <body className="flex h-full min-h-screen w-full min-w-full flex-col overflow-x-hidden">
                 <Outlet />
                 <ScrollRestoration />
                 <Scripts />
