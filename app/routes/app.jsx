@@ -81,15 +81,18 @@ export default function WhosOnApp() {
                     cursor={mapCursor}>
                     <GeolocationHandler setLocation={setLocation} />
                     <Marker longitude={location[0] || -81.2001} latitude={location[1] || 28.6024}>
-                        <div>
+                        <div className="flex flex-col space-y-1">
                             <ProfilePicture
                                 user={user}
                                 size="w-12"
                                 textSize="text-sm"
-                                className={`rounded-full shadow-2xl ${
+                                className={`mx-auto rounded-full shadow-2xl ${
                                     status ? "opacity-100" : "opacity-50"
                                 }`}
                             />
+                            <div className="flex flex-row rounded-full bg-primary px-2 py-0.5 font-sans text-3xs font-extrabold uppercase tracking-wide text-gray-50">
+                                You Are Here
+                            </div>
                         </div>
                     </Marker>
                 </Map>
