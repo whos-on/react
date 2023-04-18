@@ -16,6 +16,16 @@ const apiSuccess = (req, data) => {
     }
 }
 
+const url = (path, query) => {
+    let url = new URL(path, global.env.WHOSON_API_URL)
+    if (query) {
+        for (let [key, value] of Object.entries(query)) {
+            url?.searchParams?.append(key, value)
+        }
+    }
+    return url?.href || null
+}
+
 //!: Bad practice... should use session cookies instead but too lazy tbh
 export const userCookie = () =>
     createCookie("wo_uid", {
@@ -26,14 +36,17 @@ export const userCookie = () =>
         httpOnly: true,
     })
 
-export default {
+const api = {
+    constants: {
+        HEADERS: {
+            "Content-Type": "application/json",
+        }
+    },
     user: {
         register: async ({ email, password, username, firstName, lastName }) => {
-            let req = await fetch(new URL("/api/user/register/", global.env.WHOSON_API_URL).href, {
+            let res = await fetch(url("/api/user/register/"), {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: api.constants.HEADERS,
                 body: JSON.stringify({
                     email,
                     password,
@@ -43,29 +56,27 @@ export default {
                 }),
             })
 
-            if (req.status >= 500) return apiError(req, "Server error")
-            else if (req.status == 400) return apiError(req, await req.json())
-            else if (req.status == 201) return apiSuccess(req, null)
-            else return apiError(req, "Unknown error")
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 400) return apiError(res, await res.json())
+            else if (res.status == 201) return apiSuccess(res, null)
+            else return apiError(res, "Unknown error")
         },
 
         login: async ({ email, password }) => {
-            let req = await fetch(new URL("/api/user/login/", global.env.WHOSON_API_URL).href, {
+            let res = await fetch(url("/api/user/login/"), {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: api.constants.HEADERS,
                 body: JSON.stringify({
                     email,
                     password,
                 }),
             })
 
-            if (req.status >= 500) return apiError(req, "Server error")
-            else if (req.status == 400) return apiError(req, "Missing email or password")
-            else if (req.status >= 401) return apiError(req, "Invalid email or password")
-            else if (req.status == 200) return apiSuccess(req, await req.json())
-            else return apiError(req, "Unknown error")
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 400) return apiError(res, "Missing email or password")
+            else if (res.status >= 401) return apiError(res, "Invalid email or password")
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
         },
 
         current: async req => {
@@ -74,5 +85,30 @@ export default {
             let res = await userCookie().parse(cookieHeader)
             return res || null
         },
+
+        refresh: async (req, status, { lat, long }) => {
+            if (!status) return apiError(req, "Missing status")
+            if (!lat || !long) return apiError(req, "Malformed location was passed")
+
+            let user = await api.user.current(req)
+            if (!user) return null
+
+            let res = await fetch(url("/api/user/refresh/"), {
+                method: "PUT",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    id: user.id,
+                    userStatus: status,
+                    location: { latitude: lat, longitude: long },
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 400) return apiError(res, "Missing user id")
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
+        }
     },
 }
+
+export default api

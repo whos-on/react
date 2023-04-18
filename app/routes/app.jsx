@@ -1,33 +1,76 @@
-import { redirect } from "@remix-run/cloudflare"
+import { json, redirect } from "@remix-run/cloudflare"
 import NavigationBar from "~/components/common/NavigationBar"
 import whoson from "~/utils/whoson"
 import Map, { useMap } from "react-map-gl"
 import Footer from "~/components/app/Footer"
-import { Outlet, useLoaderData } from "@remix-run/react"
-import { useState } from "react"
+import { Outlet, useActionData, useFetcher, useLoaderData } from "@remix-run/react"
+import { useEffect, useState } from "react"
 
 export const loader = async ({ request }) => {
     // Check if user isn't logged in
     let user = await whoson.user.current(request)
     if (!user) throw redirect("/login")
 
-    return { user }
+    return json({ user })
+}
+
+export const action = async ({ request }) => {
+    // Check if user isn't logged in
+    let user = await whoson.user.current(request)
+    if (!user) throw redirect("/login")
+
+    let refreshData = await request.formData()
+    let status = refreshData.get("status")
+    let lat = refreshData.get("lat")
+    let long = refreshData.get("long")
+
+    return json({ ...(await whoson.user.refresh(request, status, { lat, long })) })
 }
 
 export default function WhosOnApp() {
-    const disableMap = false // Done for testing so we don't burn through our Mapbox API quota
+    // Done for testing so we don't burn through our Mapbox API quota
+    const disableMap = false
     const { user } = useLoaderData() || {}
+    const fetcher = useFetcher()
+    const { data: refreshData } = fetcher?.data || {}
 
     const [mapCursor, setMapCursor] = useState("auto")
     const [status, setStatus] = useState(1)
     const [location, setLocation] = useState({
-        lat: 28.6024,
-        long: -81.2001,
+        lat: null,
+        long: null,
     })
 
     const map = useMap()
 
     if (!user) throw new Error(`User is not logged in. (${user})`)
+
+    useEffect(() => {
+        let geo = navigator.geolocation.watchPosition(onUpdate, onError, {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 5000,
+        })
+
+        function onUpdate(pos) {
+            let { latitude: lat, longitude: long } = pos?.coords || {}
+            setLocation({ lat, long })
+        }
+
+        async function onError(err) {
+            console.error(err)
+        }
+
+        return () => navigator.geolocation.clearWatch(geo)
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    useEffect(() => {
+        fetcher.submit({ status, ...location }, { method: "POST" })
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [location, status])
 
     const MAPBOX_PUBLIC_ACCESS_TOKEN = (global || window)?.env?.MAPBOX_PUBLIC_ACCESS_TOKEN
 
