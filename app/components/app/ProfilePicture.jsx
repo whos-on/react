@@ -6,6 +6,7 @@ export default function ProfilePicture({
     size = "w-7 h-7",
     textSize = "text-sm",
     onClick = null,
+    className,
     ...props
 }) {
     if (!user) return null
@@ -13,7 +14,7 @@ export default function ProfilePicture({
     const Container = onClick ? "button" : "div"
 
     return (
-        <div className="relative flex-shrink-0 flex-grow-0 " {...props}>
+        <div className={`relative flex-shrink-0 flex-grow-0 ${className}`} {...props}>
             <Container
                 className={`flex aspect-square select-none rounded-full ${size}`}
                 style={{ backgroundColor: userToBgColor(user) }}
