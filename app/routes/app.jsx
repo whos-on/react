@@ -15,9 +15,15 @@ export const loader = async ({ request }) => {
 }
 
 export default function WhosOnApp() {
+    const disableMap = false // Done for testing so we don't burn through our Mapbox API quota
     const { user } = useLoaderData() || {}
 
     const [mapCursor, setMapCursor] = useState("auto")
+    const [status, setStatus] = useState(1)
+    const [location, setLocation] = useState({
+        lat: 28.6024,
+        long: -81.2001,
+    })
 
     const map = useMap()
 
@@ -27,34 +33,30 @@ export default function WhosOnApp() {
 
     return (
         <div className="flex h-screen max-h-full min-h-full w-screen min-w-full max-w-full flex-shrink flex-grow overflow-hidden">
-            {/* <button
-                onClick={() => {
-                    window.location.href = "/logout"
-                }}>
-                Log out
-            </button> */}
             <div className="flex h-screen min-h-full w-screen min-w-full flex-shrink flex-grow">
-                <Map
-                    initialViewState={{
-                        latitude: 28.6024,
-                        longitude: -81.2001,
-                        zoom: 16,
-                    }}
-                    style={{ width: "100%", height: "100%" }}
-                    mapboxAccessToken={MAPBOX_PUBLIC_ACCESS_TOKEN}
-                    mapStyle="mapbox://styles/skyclo/clgk1iq1w00nn01lcmk8g6i1i"
-                    className="h-full min-h-full w-full min-w-full"
-                    attributionControl={false}
-                    onDragStart={() => {
-                        setMapCursor("grabbing")
-                    }}
-                    onDragEnd={() => {
-                        setMapCursor("auto")
-                    }}
-                    cursor={mapCursor}
-                />
+                {!disableMap && (
+                    <Map
+                        initialViewState={{
+                            latitude: location.lat || 28.6024,
+                            longitude: location.long || -81.2001,
+                            zoom: 16,
+                        }}
+                        style={{ width: "100%", height: "100%" }}
+                        mapboxAccessToken={MAPBOX_PUBLIC_ACCESS_TOKEN}
+                        mapStyle="mapbox://styles/skyclo/clgk1iq1w00nn01lcmk8g6i1i"
+                        className="h-full min-h-full w-full min-w-full"
+                        attributionControl={false}
+                        onDragStart={() => {
+                            setMapCursor("grabbing")
+                        }}
+                        onDragEnd={() => {
+                            setMapCursor("auto")
+                        }}
+                        cursor={mapCursor}
+                    />
+                )}
                 <div className="absolute top-0 left-0 right-0 bottom-0 z-40 flex h-screen max-h-screen w-screen max-w-full flex-col">
-                    <NavigationBar user={user} />
+                    <NavigationBar user={user} status={status} setStatus={setStatus} />
 
                     <div className="mx-5 mb-3 flex h-full w-1/4 flex-col rounded-xl bg-gray-50 px-6 py-4 shadow-lg ring-1 ring-gray-700 ring-opacity-20 ">
                         <Outlet />
