@@ -4,7 +4,7 @@ import whoson from "~/utils/whoson"
 import Map, { useMap } from "react-map-gl"
 import Footer from "~/components/app/Footer"
 import { Outlet, useActionData, useFetcher, useLoaderData } from "@remix-run/react"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 export const loader = async ({ request }) => {
     // Check if user isn't logged in
@@ -34,6 +34,8 @@ export default function WhosOnApp() {
     const fetcher = useFetcher()
     const { data: refreshData } = fetcher?.data || {}
 
+    const mapResize = useRef(null)
+
     const [mapCursor, setMapCursor] = useState("auto")
     const [status, setStatus] = useState(1)
     const [location, setLocation] = useState({
@@ -44,6 +46,17 @@ export default function WhosOnApp() {
     const map = useMap()
 
     if (!user) throw new Error(`User is not logged in. (${user})`)
+
+    useEffect(() => {
+        if (mapResize.current) {
+            clearInterval(mapResize.current)
+        }
+        mapResize.current = setInterval(() => {
+            map?.current?.resize()
+        }, 1000)
+
+        return () => clearInterval(mapResize.current)
+    }, [map])
 
     useEffect(() => {
         let geo = navigator.geolocation.watchPosition(onUpdate, onError, {
@@ -98,10 +111,10 @@ export default function WhosOnApp() {
                         cursor={mapCursor}
                     />
                 )}
-                <div className="absolute top-0 left-0 right-0 bottom-0 z-40 flex h-screen max-h-screen w-screen max-w-full flex-col">
+                <div className="pointer-events-none absolute top-0 left-0 right-0 bottom-0 z-40 flex h-screen max-h-screen w-screen max-w-full flex-col">
                     <NavigationBar user={user} status={status} setStatus={setStatus} />
 
-                    <div className="mx-5 mb-3 flex h-full w-1/4 flex-col rounded-xl bg-gray-50 px-6 py-4 shadow-lg ring-1 ring-gray-700 ring-opacity-20 ">
+                    <div className="pointer-events-auto mx-5 mb-3 flex h-full w-1/4 flex-col rounded-xl bg-gray-50 px-6 py-4 shadow-lg ring-1 ring-gray-700 ring-opacity-20">
                         <Outlet />
                     </div>
                     <Footer />
