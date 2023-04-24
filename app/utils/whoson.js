@@ -40,6 +40,11 @@ const api = {
     constants: {
         HEADERS: {
             "Content-Type": "application/json",
+        },
+        statuses: {
+            OFFLINE: 0,
+            AVAILABLE: 1,
+            BUSY: 2,
         }
     },
     user: {
@@ -86,7 +91,7 @@ const api = {
             return res || null
         },
 
-        refresh: async (req, status, { lat, long }) => {
+        refresh: async (req, status, [long, lat]) => {
             if (!status) return apiError(req, "Missing status")
             if (!lat || !long) return apiError(req, "Malformed location was passed")
 
@@ -107,7 +112,9 @@ const api = {
             else if (res.status == 400) return apiError(res, "Missing user id")
             else if (res.status == 200) return apiSuccess(res, await res.json())
             else return apiError(res, "Unknown error")
-        }
+        },
+
+
     },
 }
 
