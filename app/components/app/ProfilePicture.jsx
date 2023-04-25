@@ -1,4 +1,5 @@
 import userToBgColor from "~/utils/userToBgColor"
+import whoson from "~/utils/whoson"
 
 export default function ProfilePicture({
     user,
@@ -6,6 +7,7 @@ export default function ProfilePicture({
     size = "w-7 h-7",
     textSize = "text-sm",
     onClick = null,
+    showStatus = false,
     className,
     ...props
 }) {
@@ -24,6 +26,16 @@ export default function ProfilePicture({
                     {user?.firstName?.[0] + user?.lastName?.[0]}
                 </div>
             </Container>
+            {showStatus && (
+                <div
+                    className={`absolute left-0 bottom-0 box-content h-3 w-3 rounded-full border-t-2 border-r-2 border-gray-50 ${
+                        user?.status == whoson.constants.statuses.AVAILABLE
+                            ? "bg-green-500"
+                            : user?.status == whoson.constants.statuses.BUSY
+                            ? "bg-amber-500"
+                            : "bg-gray-500"
+                    }`}></div>
+            )}
             {children}
         </div>
     )

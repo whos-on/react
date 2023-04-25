@@ -70,9 +70,12 @@ export default function Friends() {
                     <div className="mt-4 flex flex-col space-y-4">
                         {pending.map((user, i) => (
                             <div key={i} className="flex flex-row">
-                                <ProfilePicture user={user} size="w-12 h-12" textSize="text-xl">
-                                    <div className="absolute left-0 bottom-0 box-content h-3 w-3 rounded-full border-t-2 border-r-2 border-gray-50 bg-green-500"></div>
-                                </ProfilePicture>
+                                <ProfilePicture
+                                    user={user}
+                                    size="w-12 h-12"
+                                    textSize="text-xl"
+                                    showStatus
+                                />
                                 <div className="ml-4 flex flex-col">
                                     <h2 className="text-lg font-semibold tracking-tight text-gray-900">
                                         {user.firstName} {user.lastName}
