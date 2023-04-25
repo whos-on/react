@@ -57,7 +57,7 @@ export default function Friends() {
                     {addError.toString()}
                 </div>
             )}
-            <div className="mt-4 flex w-full flex-col border-t border-t-gray-900/5 pt-4 ">
+            <div className="mt-4 flex h-full w-full flex-col border-t border-t-gray-900/5 pt-4">
                 <h2 className="font-sans text-xs font-semibold uppercase text-gray-900/80">
                     Pending Requests - {pending.length}
                 </h2>
