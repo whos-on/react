@@ -114,7 +114,39 @@ const api = {
             else return apiError(res, "Unknown error")
         },
 
+        info: async (req, username) => {
+            if (!username) return apiError(req, "Missing username")
 
+            let res = await fetch(url("/api/user/info/"), {
+                method: "POST",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    username,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 400) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
+        },
+
+        search: async (req, query) => {
+            if (!query) return apiError(req, "Missing query")
+
+            let res = await fetch(url("/api/user/search/"), {
+                method: "POST",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    query,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 400) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
+        },
     },
 
     friend: {
@@ -134,11 +166,11 @@ const api = {
             })
 
             if (res.status >= 500) return apiError(res, "Server error")
-            else if (res.status == 400) return apiError(res, await res.json())
             else if (res.status == 404) return apiError(res, "User not found")
+            else if (res.status == 400) return apiError(res, await res.json())
             else if (res.status == 200) return apiSuccess(res, await res.json())
             else return apiError(res, "Unknown error")
-        }
+        },
     }
 }
 
