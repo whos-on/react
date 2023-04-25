@@ -33,13 +33,26 @@ export const action = async ({ request }) => {
     let { data, error } = await whoson.user.refresh(request, status, [long, lat])
     if (error) return json({ error })
 
+    data.friends.map(friend => {
+        if (!whoson.user.isOnline(friend))
+            friend.status = 0
+        return friend
+    })
     let pending = [],
         requests = []
     for await (let user of data.pending) {
-        pending.push((await whoson.user.info(request, user))?.data)
+        let { data } = await whoson.user.info(request, user) || {}
+        if (data) {
+            // If the user hasn't updated their status in 2 minutes, consider them offline
+            pending.push({ ...data, status: whoson.user.isOnline(data) ? data.status : 0 })
+        }
     }
     for await (let user of data.requests) {
-        requests.push((await whoson.user.info(request, user))?.data)
+        let { data } = await whoson.user.info(request, user) || {}
+        if (data) {
+            // If the user hasn't updated their status in 2 minutes, consider them offline
+            requests.push({...data, status: whoson.user.isOnline(data) ? data.status : 0})
+        }
     }
 
     return json({ data: { ...data, pending, requests } })
@@ -47,7 +60,7 @@ export const action = async ({ request }) => {
 
 export default function WhosOnApp() {
     // Done for testing so we don't burn through our Mapbox API quota
-    const disableMap = true
+    const disableMap = false
     const { user } = useLoaderData() || {}
     const fetcher = useFetcher()
     const { data: refreshData, error: refreshError } = fetcher?.data || {}

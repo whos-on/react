@@ -147,6 +147,11 @@ const api = {
             else if (res.status == 200) return apiSuccess(res, await res.json())
             else return apiError(res, "Unknown error")
         },
+
+        isOnline: user => {
+            if (!user) return apiError(null, "Missing user")
+            return Date.now() - new Date(user.lastUpdated) <= 1000 * 60 * 2
+        }
     },
 
     friend: {

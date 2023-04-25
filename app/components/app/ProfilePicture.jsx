@@ -33,7 +33,7 @@ export default function ProfilePicture({
                             ? "bg-green-500"
                             : user?.status == whoson.constants.statuses.BUSY
                             ? "bg-amber-500"
-                            : "bg-gray-500"
+                            : "opacity-0"
                     }`}></div>
             )}
             {children}
