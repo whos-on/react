@@ -30,20 +30,35 @@ export const action = async ({ request }) => {
     let lat = refreshData.get("lat")
     let long = refreshData.get("long")
 
-    return json({ ...(await whoson.user.refresh(request, status, [long, lat])) })
+    let { data, error } = await whoson.user.refresh(request, status, [long, lat])
+    if (error) return json({ error })
+
+    let pending = [],
+        requests = []
+    for await (let user of data.pending) {
+        pending.push((await whoson.user.info(request, user))?.data)
+    }
+    for await (let user of data.requests) {
+        requests.push((await whoson.user.info(request, user))?.data)
+    }
+
+    return json({ data: { ...data, pending, requests } })
 }
 
 export default function WhosOnApp() {
     // Done for testing so we don't burn through our Mapbox API quota
-    const disableMap = false
+    const disableMap = true
     const { user } = useLoaderData() || {}
     const fetcher = useFetcher()
-    const { data: refreshData } = fetcher?.data || {}
+    const { data: refreshData, error: refreshError } = fetcher?.data || {}
 
     const [mapCursor, setMapCursor] = useState("auto")
     const [status, setStatus] = useState(1)
     const [location, setLocation] = useState([null, null])
     const [mapReady, setMapReady] = useState(false)
+    const [friends, setFriends] = useState([])
+    const [pending, setPending] = useState([])
+    const [requests, setRequests] = useState([])
 
     if (!user) throw new Error(`User is not logged in. (${user})`)
 
@@ -52,6 +67,14 @@ export default function WhosOnApp() {
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location, status])
+
+    useEffect(() => {
+        if (refreshData && !refreshError) {
+            setFriends(refreshData.friends)
+            setPending(refreshData.pending)
+            setRequests(refreshData.requests)
+        } else console.log(refreshError)
+    }, [refreshData, refreshError])
 
     const MAPBOX_PUBLIC_ACCESS_TOKEN = (global || window)?.env?.MAPBOX_PUBLIC_ACCESS_TOKEN
 
@@ -101,7 +124,19 @@ export default function WhosOnApp() {
                 <NavigationBar user={user} status={status} setStatus={setStatus} />
 
                 <div className="pointer-events-auto mx-5 mb-3 flex h-full w-1/4 flex-col rounded-xl bg-gray-50 px-6 py-4 shadow-lg ring-1 ring-gray-700 ring-opacity-20">
-                    <Outlet />
+                    <Outlet
+                        context={{
+                            friends,
+                            pending,
+                            requests,
+                            forceRefresh: () => {
+                                fetcher.submit(
+                                    { status, long: location[0], lat: location[1] },
+                                    { method: "POST" }
+                                )
+                            },
+                        }}
+                    />
                 </div>
                 <Footer />
             </div>
