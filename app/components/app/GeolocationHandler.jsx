@@ -1,31 +1,46 @@
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { useMap } from "react-map-gl"
 
 export default function GeolocationHandler({ setLocation }) {
     const map = useMap()
 
+    const loc = useRef([null, null])
+
+    const options = {
+        enableHighAccuracy: false,
+        timeout: 5000,
+    }
+
+    useEffect(() => {
+        setLocation(loc.current)
+        let interval = setInterval(() => {
+            setLocation(loc.current)
+        }, 2000)
+
+        return () => clearInterval(interval)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
     useEffect(() => {
         let firstGeoUpdate = true
-        let geo = navigator.geolocation.watchPosition(onUpdate, onError, {
-            enableHighAccuracy: false,
-            timeout: 5000,
-        })
 
-        function onUpdate(pos) {
+        let geo = navigator.geolocation.watchPosition(handleUpdate, handleError, options)
+
+        function handleUpdate(pos) {
             let { latitude: lat, longitude: long } = pos?.coords || {}
             if (firstGeoUpdate) {
                 firstGeoUpdate = false
-                map.current.jumpTo({
+                map.current.flyTo({
                     center: [long, lat],
                     zoom: 16,
-                    speed: 0.5,
+                    speed: 0.7,
                     curve: 1,
                 })
             }
-            setLocation([long, lat])
+            loc.current = [long, lat]
         }
 
-        async function onError(err) {
+        async function handleError(err) {
             console.error(err)
         }
 
