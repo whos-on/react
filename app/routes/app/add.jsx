@@ -41,7 +41,7 @@ export default function Friends() {
     return (
         <>
             <Header title="Add Friend" back={true} />
-            <Form className="mt-4 flex flex-row" method="post">
+            <Form className="flex flex-row" method="post">
                 <InlineInput
                     name="username"
                     placeholder="Username"

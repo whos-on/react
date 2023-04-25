@@ -3,7 +3,7 @@ import { ArrowLeftIcon, PlusIcon, SearchIcon, UserPlusIcon } from "lucide-react"
 
 export default function Header({ title = "No title provided :(", back = false }) {
     return (
-        <div className="flex flex-row">
+        <div className="mb-4 flex flex-row">
             {back && (
                 <Link className="my-auto mr-2 p-1" to="/app">
                     <ArrowLeftIcon className="h-4 w-4 stroke-2 text-gray-900/80" />
