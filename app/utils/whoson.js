@@ -114,7 +114,134 @@ const api = {
             else return apiError(res, "Unknown error")
         },
 
+        info: async (req, { username = null, id = null }) => {
+            if (!username && !id) return apiError(req, "Missing username or id")
 
+            let body = {}
+            if (username) body.username = username
+            if (id) body.id = id
+
+            let res = await fetch(url("/api/user/info/"), {
+                method: "POST",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify(body)
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 400) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
+        },
+
+        search: async (req, query) => {
+            if (!query) return apiError(req, "Missing query")
+
+            let res = await fetch(url("/api/user/search/"), {
+                method: "POST",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    query,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 400) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
+        },
+
+        isOnline: user => {
+            if (!user) return apiError(null, "Missing user")
+            return user.status != api.constants.statuses.OFFLINE && Date.now() - new Date(user.lastUpdated) <= 1000 * 60 * 2
+        }
+    },
+
+    friend: {
+        add: async (req, username) => {
+            if (!username) return apiError(req, "Missing username")
+
+            let user = await api.user.current(req)
+            if (!user) return null
+
+            let res = await fetch(url("/api/friend/addFriend/"), {
+                method: "PUT",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    id: user.id,
+                    search: username,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 404) return apiError(res, "User not found")
+            else if (res.status == 400) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
+        },
+
+        accept: async (req, username) => {
+            if (!username) return apiError(req, "Missing username")
+
+            let user = await api.user.current(req)
+            if (!user) return null
+
+            let res = await fetch(url("/api/friend/processRequest/"), {
+                method: "PUT",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    id: user.id,
+                    requester: username,
+                    accept: 1,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 404) return apiError(res, "User not found")
+            else if (res.status == 400) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
+        },
+
+        deny: async (req, username) => {
+            if (!username) return apiError(req, "Missing username")
+
+            let user = await api.user.current(req)
+            if (!user) return null
+
+            let res = await fetch(url("/api/friend/processRequest/"), {
+                method: "PUT",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    id: user.id,
+                    requester: username,
+                    accept: 0,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 404) return apiError(res, "User not found")
+            else if (res.status == 400) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
+        },
+
+        list: async req => {
+            let user = await api.user.current(req)
+            if (!user) return null
+
+            let res = await fetch(url("/api/friend/get/"), {
+                method: "POST",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    id: user.id,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 400) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, (await res.json())?.friends)
+            else return apiError(res, "Unknown error")
+        }
     },
 }
 

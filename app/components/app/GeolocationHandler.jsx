@@ -4,28 +4,34 @@ import { useMap } from "react-map-gl"
 export default function GeolocationHandler({ setLocation }) {
     const map = useMap()
 
+    const options = {
+        enableHighAccuracy: false,
+        timeout: 5000,
+    }
+
     useEffect(() => {
         let firstGeoUpdate = true
-        let geo = navigator.geolocation.watchPosition(onUpdate, onError, {
-            enableHighAccuracy: false,
-            timeout: 5000,
-        })
 
-        function onUpdate(pos) {
+        navigator.geolocation.getCurrentPosition(handleUpdate, handleError, options)
+
+        let geo = navigator.geolocation.watchPosition(handleUpdate, handleError, options)
+
+        function handleUpdate(pos) {
             let { latitude: lat, longitude: long } = pos?.coords || {}
+            console.log(lat, long)
             if (firstGeoUpdate) {
                 firstGeoUpdate = false
-                map.current.jumpTo({
+                map.current.flyTo({
                     center: [long, lat],
                     zoom: 16,
-                    speed: 0.5,
+                    speed: 0.7,
                     curve: 1,
                 })
             }
             setLocation([long, lat])
         }
 
-        async function onError(err) {
+        async function handleError(err) {
             console.error(err)
         }
 
