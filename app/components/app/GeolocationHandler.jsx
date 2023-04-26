@@ -1,10 +1,8 @@
-import { useEffect, useRef } from "react"
+import { useEffect } from "react"
 import { useMap } from "react-map-gl"
 
 export default function GeolocationHandler({ setLocation }) {
     const map = useMap()
-
-    const loc = useRef([null, null])
 
     const options = {
         enableHighAccuracy: false,
@@ -12,22 +10,15 @@ export default function GeolocationHandler({ setLocation }) {
     }
 
     useEffect(() => {
-        setLocation(loc.current)
-        let interval = setInterval(() => {
-            setLocation(loc.current)
-        }, 2000)
-
-        return () => clearInterval(interval)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
-
-    useEffect(() => {
         let firstGeoUpdate = true
+
+        navigator.geolocation.getCurrentPosition(handleUpdate, handleError, options)
 
         let geo = navigator.geolocation.watchPosition(handleUpdate, handleError, options)
 
         function handleUpdate(pos) {
             let { latitude: lat, longitude: long } = pos?.coords || {}
+            console.log(lat, long)
             if (firstGeoUpdate) {
                 firstGeoUpdate = false
                 map.current.flyTo({
@@ -37,7 +28,7 @@ export default function GeolocationHandler({ setLocation }) {
                     curve: 1,
                 })
             }
-            loc.current = [long, lat]
+            setLocation([long, lat])
         }
 
         async function handleError(err) {

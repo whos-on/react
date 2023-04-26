@@ -114,15 +114,17 @@ const api = {
             else return apiError(res, "Unknown error")
         },
 
-        info: async (req, username) => {
-            if (!username) return apiError(req, "Missing username")
+        info: async (req, { username = null, id = null }) => {
+            if (!username && !id) return apiError(req, "Missing username or id")
+
+            let body = {}
+            if (username) body.username = username
+            if (id) body.id = id
 
             let res = await fetch(url("/api/user/info/"), {
                 method: "POST",
                 headers: api.constants.HEADERS,
-                body: JSON.stringify({
-                    username,
-                })
+                body: JSON.stringify(body)
             })
 
             if (res.status >= 500) return apiError(res, "Server error")
@@ -150,7 +152,7 @@ const api = {
 
         isOnline: user => {
             if (!user) return apiError(null, "Missing user")
-            return Date.now() - new Date(user.lastUpdated) <= 1000 * 60 * 2
+            return user.status != api.constants.statuses.OFFLINE && Date.now() - new Date(user.lastUpdated) <= 1000 * 60 * 2
         }
     },
 
@@ -222,6 +224,24 @@ const api = {
             else if (res.status == 200) return apiSuccess(res, await res.json())
             else return apiError(res, "Unknown error")
         },
+
+        list: async req => {
+            let user = await api.user.current(req)
+            if (!user) return null
+
+            let res = await fetch(url("/api/friend/get/"), {
+                method: "POST",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    id: user.id,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 400) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, (await res.json())?.friends)
+            else return apiError(res, "Unknown error")
+        }
     },
 }
 
