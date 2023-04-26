@@ -76,7 +76,7 @@ export default function WhosOnApp() {
         // automatic update interval
         let updateInterval = null
         let handler = () => {
-            updateInterval = setTimeout(handler, 1000 * 4) // 4 seconds
+            updateInterval = setTimeout(handler, 1000 * 10) // 10 seconds
             if (!location[0] || !location[1]) return
             console.log(location)
             fetcher.submit({ status, long: location[0], lat: location[1] }, { method: "POST" })
