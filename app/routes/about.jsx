@@ -4,7 +4,6 @@ import NavigationBar from "~/components/common/NavigationBar"
 export default function About() {
     return (
         <>
-            <NavigationBar />
             <main>
                 <div className="w-full max-w-full bg-gradient-to-tr from-secondary to-primary px-24 pt-32 pb-24">
                     <h1 className="mx-auto text-center font-sans text-6xl font-extrabold tracking-tight text-gray-50">
