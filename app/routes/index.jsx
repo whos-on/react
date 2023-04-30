@@ -1,6 +1,14 @@
-import { Link } from "@remix-run/react"
+import { json } from "@remix-run/cloudflare"
+import { Link, useLoaderData } from "@remix-run/react"
+import whoson from "~/utils/whoson"
+
+export const loader = async ({ request }) => {
+    return json({ user: await whoson.user.current(request) })
+}
 
 export default function Index() {
+    const { user } = useLoaderData() || {}
+
     return (
         <div
             className="h-screen min-h-full w-full min-w-full bg-gray-50"
@@ -16,6 +24,25 @@ export default function Index() {
                             alt="logo"
                         />
                     </Link>
+                    <div className="ml-auto flex flex-row items-center space-x-8">
+                        <Link to="/about" className="text-sm font-medium text-gray-900/80">
+                            About
+                        </Link>
+                        <a
+                            href="https://github.com/whos-on"
+                            className="text-sm font-medium text-gray-900/80">
+                            GitHub
+                        </a>
+                        {user ? (
+                            <Link to="/app" className="text-sm font-bold text-primary">
+                                Go to App
+                            </Link>
+                        ) : (
+                            <Link to="/login" className="text-sm font-bold text-primary">
+                                Log In
+                            </Link>
+                        )}
+                    </div>
                 </nav>
                 <div className="flex h-screen min-h-full w-full min-w-full flex-row items-center px-32">
                     <div className="flex w-1/2 flex-col pr-24">
