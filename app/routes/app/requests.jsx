@@ -7,6 +7,10 @@ import Header from "~/components/app/Header"
 import ProfilePicture from "~/components/app/ProfilePicture"
 import whoson from "~/utils/whoson"
 
+export const meta = () => ({
+    title: "Who's On - Requests",
+})
+
 export const action = async ({ request }) => {
     // Check if user isn't logged in
     let user = await whoson.user.current(request)

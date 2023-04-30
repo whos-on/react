@@ -1,5 +1,8 @@
 import Footer from "~/components/app/Footer"
-import NavigationBar from "~/components/common/NavigationBar"
+
+export const meta = () => ({
+    title: "Who's On - About",
+})
 
 export default function About() {
     return (

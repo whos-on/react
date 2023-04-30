@@ -1,5 +1,4 @@
 import { Link } from "@remix-run/react"
-import ProfilePicture from "~/components/app/ProfilePicture"
 
 export default function Index() {
     return (

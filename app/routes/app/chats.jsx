@@ -3,6 +3,10 @@ import { ArrowRightIcon, Frown, UsersIcon } from "lucide-react"
 import BackgroundFiller from "~/components/app/BackgroundFiller"
 import Header from "~/components/app/Header"
 
+export const meta = () => ({
+    title: "Who's On - Chats",
+})
+
 export default function Chats() {
     const { friends, requests, forceRefresh } = useOutletContext() || {}
 
