@@ -1,6 +1,8 @@
-export default function NavigationBar() {
+export default function NavigationBar({ user, status, setStatus, children, className, ...props }) {
     return (
-        <nav className="absolute top-0 left-0 right-0 mx-5 my-3 flex flex-row items-center justify-between rounded-full bg-gray-50 py-2 px-6 shadow-lg ring-1 ring-gray-700 ring-opacity-20">
+        <nav
+            className={`pointer-events-auto z-40 mx-5 my-3 flex flex-row items-center justify-between rounded-full bg-gray-50 py-2 px-6 shadow-lg ring-1 ring-gray-700 ring-opacity-20 ${className}`}
+            {...props}>
             <a href="/">
                 <img
                     className="mx-auto my-2 h-4 w-auto"
@@ -8,7 +10,7 @@ export default function NavigationBar() {
                     alt="logo"
                 />
             </a>
-            <div className="h-6 w-6 rounded-full bg-[url('/images/sample_pfp.jpeg')] bg-cover"></div>
+            {children}
         </nav>
     )
 }
