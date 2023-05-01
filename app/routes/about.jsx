@@ -1,10 +1,43 @@
+import { json } from "@remix-run/cloudflare"
+import { Link, useLoaderData } from "@remix-run/react"
 import Footer from "~/components/app/Footer"
 import NavigationBar from "~/components/common/NavigationBar"
+import whoson from "~/utils/whoson"
+
+export const meta = () => ({
+    title: "Who's On - About",
+})
+
+export const loader = async ({ request }) => {
+    return json({ user: await whoson.user.current(request) })
+}
 
 export default function About() {
+    const { user } = useLoaderData() || {}
+
     return (
         <>
-            <NavigationBar />
+            <NavigationBar className="absolute left-0 right-0 top-0 z-40">
+                <div className="ml-auto flex flex-row items-center space-x-8">
+                    <Link to="/about" className="text-sm font-medium text-gray-900/80">
+                        About
+                    </Link>
+                    <a
+                        href="https://github.com/whos-on"
+                        className="text-sm font-medium text-gray-900/80">
+                        GitHub
+                    </a>
+                    {user ? (
+                        <Link to="/app" className="text-sm font-bold text-primary">
+                            Go to App
+                        </Link>
+                    ) : (
+                        <Link to="/login" className="text-sm font-bold text-primary">
+                            Log In
+                        </Link>
+                    )}
+                </div>
+            </NavigationBar>
             <main>
                 <div className="w-full max-w-full bg-gradient-to-tr from-secondary to-primary px-24 pt-32 pb-24">
                     <h1 className="mx-auto text-center font-sans text-6xl font-extrabold tracking-tight text-gray-50">
@@ -42,7 +75,7 @@ export default function About() {
                 ].map((content, i) => (
                     <div className="w-full max-w-full bg-gray-50 px-24 py-24" key={i}>
                         <div className="mx-auto w-full max-w-3xl">
-                            <h2 className="section-header w-max text-left font-sans text-4xl font-extrabold tracking-tight text-transparent">
+                            <h2 className="w-max text-left font-sans text-4xl font-extrabold tracking-tight text-gray-900">
                                 {content.header}
                             </h2>
                             <div className="mt-2 flex flex-col font-sans text-base font-medium text-gray-900/80">
@@ -50,7 +83,7 @@ export default function About() {
                                 {content.content &&
                                     content.content.map((content, i) => (
                                         <div key={i} className="mt-4">
-                                            <h3 className="section-header mb-2 w-max text-left font-sans text-2xl font-bold text-transparent">
+                                            <h3 className="mb-2 w-max text-left font-sans text-2xl font-bold text-gray-900">
                                                 {content.header}
                                             </h3>
                                             <p>{content.paragraph}</p>
@@ -62,7 +95,7 @@ export default function About() {
                 ))}
                 <div className="w-full max-w-full bg-gray-50 px-24 py-24">
                     <div className="mx-auto w-full max-w-3xl">
-                        <h2 className="section-header w-max text-left font-sans text-4xl font-extrabold tracking-tight text-transparent">
+                        <h2 className="w-max text-left font-sans text-4xl font-extrabold tracking-tight text-gray-900">
                             Our Team
                         </h2>
                         <div className="mt-2 grid grid-flow-row auto-rows-auto grid-cols-4 justify-around font-sans text-base font-medium text-gray-900/80">
@@ -122,7 +155,7 @@ export default function About() {
                 </div>
                 <div className="w-full max-w-full bg-gray-50 px-24 py-24">
                     <div className="mx-auto w-full max-w-3xl">
-                        <h2 className="section-header w-max text-left font-sans text-4xl font-extrabold tracking-tight text-transparent">
+                        <h2 className="w-max text-left font-sans text-4xl font-extrabold tracking-tight text-gray-900">
                             Source Code
                         </h2>
                         <div className="mt-2 flex flex-col font-sans text-base font-medium text-gray-900/80">

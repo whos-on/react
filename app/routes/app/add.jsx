@@ -8,6 +8,10 @@ import BackgroundFiller from "~/components/app/BackgroundFiller"
 import { useEffect, useState } from "react"
 import ProfilePicture from "~/components/app/ProfilePicture"
 
+export const meta = () => ({
+    title: "Who's On - Add Friend",
+})
+
 export const action = async ({ request }) => {
     // Check if user isn't logged in
     let user = await whoson.user.current(request)
