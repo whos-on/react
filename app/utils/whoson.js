@@ -153,6 +153,11 @@ const api = {
         isOnline: user => {
             if (!user) return apiError(null, "Missing user")
             return user.status != api.constants.statuses.OFFLINE && Date.now() - new Date(user.lastUpdated) <= 1000 * 60 * 2
+        },
+
+        isVerified: user => {
+            if (!user) return apiError(null, "Missing user")
+            return !!user.verificationCode
         }
     },
 
