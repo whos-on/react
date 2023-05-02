@@ -289,7 +289,7 @@ export default function WhosOnApp() {
                     </ProfilePicture>
                 </NavigationBar>
 
-                <div className="pointer-events-auto mx-5 mb-3 flex h-full w-1/4 flex-col rounded-xl bg-gray-50 px-6 py-4 shadow-lg ring-1 ring-gray-700 ring-opacity-20">
+                <div className="pointer-events-auto mx-5 mb-3 flex h-full w-1/2 flex-col rounded-xl bg-gray-50 px-6 py-4 shadow-lg ring-1 ring-gray-700 ring-opacity-20 lg:w-1/3 xl:w-1/4">
                     <Outlet
                         context={{
                             friends,
