@@ -133,7 +133,7 @@ export default function NewChat() {
                                         }
                                     />
                                     <div
-                                        className={`flex flex-col rounded-xl bg-gray-50 py-2 px-3 font-sans text-sm font-medium ${
+                                        className={`flex flex-col rounded-xl py-2 px-3 font-sans text-sm font-medium ${
                                             message.sender == user.username
                                                 ? "bg-green-500 text-gray-50"
                                                 : "bg-gray-200 text-gray-900/80"
