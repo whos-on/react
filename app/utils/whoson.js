@@ -199,19 +199,13 @@ const api = {
             else return apiError(res, "Unknown error")
         },
 
-        updatePassword: async (req, password) => {
+        updatePassword: async (req, id, password) => {
             if (!password) return apiError(req, "Missing new password")
-
-            let user = await api.user.current(req)
-            if (!user) return null
 
             let res = await fetch(url("/api/user/updatepassword/"), {
                 method: "POST",
                 headers: api.constants.HEADERS,
-                body: JSON.stringify({
-                    id: user.id,
-                    password,
-                })
+                body: JSON.stringify({ id, password })
             })
 
             if (res.status >= 500) return apiError(res, "Server error")
