@@ -5,6 +5,8 @@ import { Form, useActionData, useLoaderData, useOutletContext } from "@remix-run
 import Header from "~/components/app/Header"
 import { useEffect, useState } from "react"
 import ProfilePicture from "~/components/app/ProfilePicture"
+import fromNow from "~/utils/fromNow"
+import dbToAppUserMap from "~/utils/dbToAppUserMap"
 
 export const meta = () => ({
     title: "Who's On - Chat",
@@ -100,37 +102,57 @@ export default function NewChat() {
                         {newChatError.toString()}
                     </div>
                 )}
-                <div className="flex h-full flex-col overflow-y-scroll">
-                    {messages?.map((message, i) => (
-                        <div
-                            key={i}
-                            className={`flex flex-col ${
-                                message.sender == user.username ? "items-end" : "items-start"
-                            }`}>
+                <div className="flex h-full flex-col space-y-1 overflow-y-scroll">
+                    {messages?.map((message, i) => {
+                        let dt = new Date(message.timestamp)
+                        let time = `${dt.getHours() % 12}:${dt
+                            .getMinutes()
+                            .toString()
+                            .padStart(2, "0")} ${dt.getHours() > 12 ? "PM" : "AM"}`
+
+                        return (
                             <div
-                                className={`flex flex-row items-center space-x-2 ${
-                                    message.sender == user.username ? "flex-row-reverse" : ""
+                                key={i}
+                                className={`group flex w-full flex-col ${
+                                    message.sender == user.username
+                                        ? "items-end pl-4"
+                                        : "items-start pr-4"
                                 }`}>
-                                <ProfilePicture
-                                    className={`h-6 w-6 ${
-                                        message.sender == user.username ? "ml-2" : "mr-2"
-                                    }`}
-                                    username={message.sender}
-                                />
                                 <div
-                                    className={`flex flex-col rounded-xl bg-gray-50 py-2 px-3 font-sans text-sm font-medium ${
-                                        message.sender == user.username
-                                            ? "bg-green-500 text-gray-50"
-                                            : "bg-gray-50 text-gray-900/80"
+                                    className={`flex flex-row items-center space-x-2 ${
+                                        message.sender == user.username ? "flex-row-reverse" : ""
                                     }`}>
-                                    {message.contents}
+                                    <ProfilePicture
+                                        className={`${
+                                            message.sender == user.username ? "ml-2" : "mr-2"
+                                        }`}
+                                        user={
+                                            chatInfo.people
+                                                .map(dbToAppUserMap)
+                                                .filter(p => p.username == message.sender)[0]
+                                        }
+                                    />
+                                    <div
+                                        className={`flex flex-col rounded-xl bg-gray-50 py-2 px-3 font-sans text-sm font-medium ${
+                                            message.sender == user.username
+                                                ? "bg-green-500 text-gray-50"
+                                                : "bg-gray-200 text-gray-900/80"
+                                        }`}>
+                                        {message.contents}
+                                    </div>
+                                    <div className="flex flex-col font-sans text-xs text-gray-500/50 opacity-0 group-hover:opacity-100">
+                                        {time}
+                                    </div>
                                 </div>
+                                {i == messages.length - 1 && (
+                                    <div
+                                        className={`mx-auto mt-1 flex flex-row text-center font-sans text-xs font-normal text-gray-500/50`}>
+                                        {fromNow(message.timestamp)}
+                                    </div>
+                                )}
                             </div>
-                            <div className="mt-1 flex w-full flex-row text-center font-sans text-xs font-semibold text-gray-500">
-                                {message.time}
-                            </div>
-                        </div>
-                    ))}
+                        )
+                    })}
                 </div>
                 <div className="mt-auto flex flex-row items-center pt-4">
                     <input
@@ -138,6 +160,7 @@ export default function NewChat() {
                                 focus:outline-none focus:ring-1 focus:ring-primary"
                         placeholder="Start typing..."
                         name="message"
+                        value={message}
                         onChange={e => {
                             setMessage(e.target.value)
                             setNewChatError(null)

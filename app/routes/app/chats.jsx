@@ -2,13 +2,17 @@ import { Link, useOutletContext } from "@remix-run/react"
 import { ArrowRightIcon, Frown, PlusIcon, SearchIcon, UsersIcon } from "lucide-react"
 import BackgroundFiller from "~/components/app/BackgroundFiller"
 import Header from "~/components/app/Header"
+import ProfilePicture from "~/components/app/ProfilePicture"
+import dbToAppUserMap from "~/utils/dbToAppUserMap"
+import fromNow from "~/utils/fromNow"
+import whoson from "~/utils/whoson"
 
 export const meta = () => ({
     title: "Who's On - Chats",
 })
 
 export default function Chats() {
-    const { friends, requests, forceRefresh } = useOutletContext() || {}
+    const { user, friends, requests, chats, forceRefresh } = useOutletContext() || {}
 
     return (
         <>
@@ -40,10 +44,51 @@ export default function Chats() {
                     <ArrowRightIcon className="ml-auto h-4 w-4" />
                 </Link>
             )}
-            {!friends?.length ? (
+            {!chats?.length ? (
                 <BackgroundFiller text="Looks like you have no friends..." icon={Frown} />
             ) : (
-                <div className="flex flex-col space-y-4">{friends.map(friend => null)}</div>
+                <div className="mt-4 flex w-full flex-col space-y-4">
+                    {chats.map(chat => {
+                        let lastMessage = chat.messages[chat.messages.length - 1]
+                        let firstUser = chat.people
+                            .map(dbToAppUserMap)
+                            .filter(p => p.id != user.id)[0]
+                        const status = !whoson.user.isOnline(firstUser)
+                            ? "Unavailable"
+                            : firstUser?.status == whoson.constants.statuses.AVAILABLE
+                            ? "Available"
+                            : firstUser?.status == whoson.constants.statuses.BUSY
+                            ? "Busy"
+                            : "Unavailable"
+                        return (
+                            <Link
+                                key={chat.id}
+                                to={`/app/chats/${chat.id}`}
+                                className="flex w-full flex-row">
+                                <ProfilePicture
+                                    user={firstUser}
+                                    size="w-12 h-12"
+                                    textSize="text-xl"
+                                    showStatus={true}
+                                />
+                                <div className="ml-4 flex w-full flex-col">
+                                    <div className="flex w-full flex-row">
+                                        <h2 className="text-lg font-semibold tracking-tight text-gray-900">
+                                            {firstUser.firstName} {firstUser.lastName}
+                                        </h2>
+                                        <p className="my-auto ml-auto font-sans text-xs font-normal text-gray-900/50">
+                                            {status}
+                                        </p>
+                                    </div>
+                                    <p className="text-xs font-normal italic text-gray-900/70">
+                                        {lastMessage.sender}: {lastMessage.contents} (
+                                        {fromNow(lastMessage.timestamp)})
+                                    </p>
+                                </div>
+                            </Link>
+                        )
+                    })}
+                </div>
             )}
         </>
     )

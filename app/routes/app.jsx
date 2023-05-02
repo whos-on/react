@@ -1,10 +1,10 @@
 import { json, redirect } from "@remix-run/cloudflare"
 import NavigationBar from "~/components/common/NavigationBar"
 import whoson from "~/utils/whoson"
-import Map, { Marker, useMap } from "react-map-gl"
+import Map, { Marker } from "react-map-gl"
 import Footer from "~/components/app/Footer"
 import { Outlet, useFetcher, useLoaderData } from "@remix-run/react"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import ProfilePicture from "~/components/app/ProfilePicture"
 
 import mapboxStylesheet from "mapbox-gl/dist/mapbox-gl.css"
@@ -61,7 +61,26 @@ export const action = async ({ request }) => {
         }
     }
 
-    return json({ data: { ...data, friends, pending, requests } })
+    let { data: chats } = await whoson.chat.list(request)
+    let chatList = []
+    for await (let id of chats) {
+        let { data } = await whoson.chat.info(request, id)
+        chatList.push(data)
+    }
+
+    let { data: unread } = await whoson.chat.refreshAll(request)
+
+    return json({
+        data: {
+            ...data,
+            friends,
+            pending,
+            requests,
+            chats: chatList,
+            unreadChats: unread.chats,
+            unreadCounts: unread.counts,
+        },
+    })
 }
 
 export default function WhosOnApp() {
@@ -78,6 +97,9 @@ export default function WhosOnApp() {
     const [friends, setFriends] = useState([])
     const [pending, setPending] = useState([])
     const [requests, setRequests] = useState([])
+    const [chats, setChats] = useState([])
+    const [unreadChats, setUnreadChats] = useState([])
+    const [unreadCounts, setUnreadCounts] = useState([])
     const [statusSubMenuOpen, setStatusSubMenuOpen] = useState(false)
     const [menuOpen, setMenuOpen] = useState(false)
 
@@ -110,6 +132,9 @@ export default function WhosOnApp() {
             setFriends(refreshData.friends)
             setPending(refreshData.pending)
             setRequests(refreshData.requests)
+            setChats(refreshData.chats)
+            setUnreadChats(refreshData.unreadChats)
+            setUnreadCounts(refreshData.unreadCounts)
         }
     }, [refreshData, refreshError])
 
@@ -270,6 +295,10 @@ export default function WhosOnApp() {
                             friends,
                             pending,
                             requests,
+                            user,
+                            chats,
+                            unreadChats,
+                            unreadCounts,
                             forceRefresh: () => {
                                 fetcher.submit(
                                     { status, long: location[0], lat: location[1] },

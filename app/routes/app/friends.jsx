@@ -6,6 +6,7 @@ import Header from "~/components/app/Header"
 import BackgroundFiller from "~/components/app/BackgroundFiller"
 import { useEffect, useState } from "react"
 import ProfilePicture from "~/components/app/ProfilePicture"
+import dbToAppUserMap from "~/utils/dbToAppUserMap"
 
 export const meta = () => ({
     title: "Who's On - Manage Friends",
@@ -63,7 +64,7 @@ export default function Friends() {
                     <BackgroundFiller text="Looks like you have no friends..." icon={FrownIcon} />
                 ) : (
                     <div className="mt-4 flex flex-col space-y-4">
-                        {friends.map((user, i) => (
+                        {friends.map(dbToAppUserMap).map((user, i) => (
                             <div key={i} className="group flex flex-row">
                                 <ProfilePicture
                                     user={user}

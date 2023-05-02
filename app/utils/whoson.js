@@ -418,6 +418,42 @@ const api = {
             else if (res.status == 400) return apiError(res, await res.json())
             else if (res.status == 200) return apiSuccess(res, await res.json())
             else return apiError(res, "Unknown error")
+        },
+
+        list: async (req) => {
+            let user = await api.user.current(req)
+            if (!user) return null
+
+            let res = await fetch(url("/api/chat/get/"), {
+                method: "POST",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    id: user.id,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 404) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
+        },
+
+        refreshAll: async (req) => {
+            let user = await api.user.current(req)
+            if (!user) return null
+
+            let res = await fetch(url("/api/chat/refreshmessages/"), {
+                method: "POST",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    userId: user.id,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 404) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
         }
     },
 
