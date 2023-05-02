@@ -328,6 +328,34 @@ const api = {
             else return apiError(res, "Unknown error")
         }
     },
+
+    chat: {
+        create: async (req, users, message) => {
+            if (!users) return apiError(req, "Missing users")
+            if (typeof users == "string") users = [users]
+            if (!Array.isArray(users)) return apiError(req, "Users must be an array or string")
+            if (!message) return apiError(req, "Missing starting message")
+
+            let user = await api.user.current(req)
+            if (!user) return null
+
+            let res = await fetch(url("/api/chat/create/"), {
+                method: "POST",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    users: [user.username, ...users],
+                    message,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 404) return apiError(res, "User not found")
+            else if (res.status == 400) return apiError(res, await res.json())
+            else if (res.status == 201) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
+        },
+    },
+
 }
 
 export default api
