@@ -84,10 +84,15 @@ export default function Friends() {
                                     <button
                                         className="my-auto rounded-md bg-red-500 px-2 py-1 text-xs font-semibold text-white"
                                         onClick={() => {
-                                            fetcher.submit(
-                                                { username: user.username },
-                                                { method: "POST" }
+                                            if (
+                                                window.confirm(
+                                                    "Are you sure you want to remove this friend?"
+                                                )
                                             )
+                                                fetcher.submit(
+                                                    { username: user.username },
+                                                    { method: "POST" }
+                                                )
                                         }}>
                                         Remove
                                     </button>
