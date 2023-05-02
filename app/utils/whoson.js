@@ -354,6 +354,26 @@ const api = {
             else if (res.status == 201) return apiSuccess(res, await res.json())
             else return apiError(res, "Unknown error")
         },
+
+        getMessages: async (req, chatID) => {
+            if (!chatID) return apiError(req, "Missing chat ID")
+
+            let user = await api.user.current(req)
+            if (!user) return null
+
+            let res = await fetch(url("/api/chat/getMessage/"), {
+                method: "POST",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    chatID,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 404) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
+        },
     },
 
 }
