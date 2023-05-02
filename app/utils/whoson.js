@@ -153,6 +153,65 @@ const api = {
         isOnline: user => {
             if (!user) return apiError(null, "Missing user")
             return user.status != api.constants.statuses.OFFLINE && Date.now() - new Date(user.lastUpdated) <= 1000 * 60 * 2
+        },
+
+        isVerified: user => {
+            if (!user) return apiError(null, "Missing user")
+            return !user.verificationCode
+        },
+
+        verifyEmail: async (req, code) => {
+            if (!code) return apiError(req, "Missing verification code")
+
+            let user = await api.user.current(req)
+            if (!user) return null
+
+            let res = await fetch(url("/api/user/verify/"), {
+                method: "POST",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    id: user.id,
+                    code,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 401) return apiError(res, await res.json())
+            else if (res.status == 400) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
+        },
+
+        sendResetPassword: async (req, email) => {
+            if (!email) return apiError(req, "Missing email")
+
+            let res = await fetch(url("/api/user/resetpassword/"), {
+                method: "POST",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    email,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 400) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
+        },
+
+        updatePassword: async (req, id, password) => {
+            if (!password) return apiError(req, "Missing new password")
+
+            let res = await fetch(url("/api/user/updatepassword/"), {
+                method: "POST",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({ id, password })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 400) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
         }
     },
 
