@@ -60,7 +60,11 @@ export default function Login() {
     }, [formError])
 
     return (
-        <AuthScreen title="Log in to your account" altLink="/signup" altText="create a new account">
+        <AuthScreen
+            title="Log in to your account"
+            altLink="/signup"
+            altText="create a new account"
+            showReset>
             <AuthInput
                 name="email"
                 type="email"

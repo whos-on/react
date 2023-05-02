@@ -29,14 +29,13 @@ export const action = async ({ request }) => {
     return json({ data, error: null })
 }
 
-export default function Friends() {
+export default function AddFriends() {
     // float used because I'm too lazy to properly implement a refresh of props
     let { data, error, float } = useActionData() || {}
     const { pending, forceRefresh } = useOutletContext() || {}
     const [addError, setAddError] = useState(null)
 
     useEffect(() => {
-        console.log(error, addError)
         if (data) forceRefresh()
         else if (error) setAddError(error)
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -44,7 +43,7 @@ export default function Friends() {
 
     return (
         <>
-            <Header title="Add Friend" back={true} />
+            <Header title="Add Friend" back="/app/friends" />
             <Form className="flex flex-row" method="post">
                 <InlineInput
                     name="username"

@@ -38,12 +38,12 @@ export default function Index() {
                         )}
                     </div>
                 </NavigationBar>
-                <div className="flex h-screen min-h-full w-full min-w-full flex-row items-center px-32">
-                    <div className="flex w-1/2 flex-col pr-24">
-                        <h1 className="text-left font-sans text-7xl font-extrabold tracking-tight text-gray-900">
+                <div className="flex h-screen min-h-full w-full min-w-full flex-row items-center px-8 lg:px-24 xl:px-32">
+                    <div className="flex w-full flex-col pr-0 md:w-1/2 md:pr-8 lg:pr-16 xl:pr-24">
+                        <h1 className="text-center font-sans text-3xl font-extrabold tracking-tight text-gray-900 md:text-left md:text-5xl xl:text-7xl">
                             Never miss out on a hangout again
                         </h1>
-                        <p className="mt-8 text-left font-sans text-lg font-medium leading-relaxed text-gray-900/70">
+                        <p className="mt-6 text-center font-sans text-sm font-medium leading-relaxed text-gray-900/70 md:text-left lg:mt-8 lg:text-base xl:text-lg">
                             Add your closest friends and share your location in real time. Set your
                             status and use the interactive map to find friends nearby. Schedule
                             hangouts in advance or on the fly. Keep up to date with your friends and
@@ -51,11 +51,11 @@ export default function Index() {
                         </p>
                         <Link
                             to="/app"
-                            className="mt-8 mr-auto rounded-xl bg-primary px-6 py-3 font-sans text-base font-bold text-gray-50 shadow-sm hover:shadow-lg">
+                            className="mt-6 ml-auto mr-auto rounded-xl bg-primary px-6 py-3 font-sans text-base font-bold text-gray-50 shadow-sm hover:shadow-lg md:ml-0 lg:mt-8">
                             Get Started
                         </Link>
                     </div>
-                    <div className="flex w-1/2 flex-col items-center">
+                    <div className="hidden flex-col items-center md:flex md:w-1/2">
                         <img src="/images/whosonhero.png" alt="" className="h-auto w-auto" />
                     </div>
                 </div>

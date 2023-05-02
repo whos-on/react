@@ -1,10 +1,10 @@
 import { json, redirect } from "@remix-run/cloudflare"
 import NavigationBar from "~/components/common/NavigationBar"
 import whoson from "~/utils/whoson"
-import Map, { Marker, useMap } from "react-map-gl"
+import Map, { Marker } from "react-map-gl"
 import Footer from "~/components/app/Footer"
 import { Outlet, useFetcher, useLoaderData } from "@remix-run/react"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import ProfilePicture from "~/components/app/ProfilePicture"
 
 import mapboxStylesheet from "mapbox-gl/dist/mapbox-gl.css"
@@ -23,6 +23,8 @@ export const loader = async ({ request }) => {
     // Check if user isn't logged in
     let user = await whoson.user.current(request)
     if (!user) throw redirect("/login")
+
+    if (!whoson.user.isVerified(user)) throw redirect("/verification")
 
     return json({ user })
 }
@@ -59,7 +61,26 @@ export const action = async ({ request }) => {
         }
     }
 
-    return json({ data: { ...data, friends, pending, requests } })
+    let { data: chats } = await whoson.chat.list(request)
+    let chatList = []
+    for await (let id of chats) {
+        let { data } = await whoson.chat.info(request, id)
+        chatList.push(data)
+    }
+
+    let { data: unread } = await whoson.chat.refreshAll(request)
+
+    return json({
+        data: {
+            ...data,
+            friends,
+            pending,
+            requests,
+            chats: chatList,
+            unreadChats: unread.chats,
+            unreadCounts: unread.counts,
+        },
+    })
 }
 
 export default function WhosOnApp() {
@@ -76,6 +97,9 @@ export default function WhosOnApp() {
     const [friends, setFriends] = useState([])
     const [pending, setPending] = useState([])
     const [requests, setRequests] = useState([])
+    const [chats, setChats] = useState([])
+    const [unreadChats, setUnreadChats] = useState([])
+    const [unreadCounts, setUnreadCounts] = useState([])
     const [statusSubMenuOpen, setStatusSubMenuOpen] = useState(false)
     const [menuOpen, setMenuOpen] = useState(false)
 
@@ -85,9 +109,8 @@ export default function WhosOnApp() {
         // automatic update interval
         let updateInterval = null
         let handler = () => {
-            updateInterval = setTimeout(handler, 1000 * 10) // 10 seconds
+            updateInterval = setTimeout(handler, 1000 * 4) // 10 seconds
             if (!location[0] || !location[1]) return
-            console.log(location)
             fetcher.submit({ status, long: location[0], lat: location[1] }, { method: "POST" })
         }
 
@@ -101,7 +124,6 @@ export default function WhosOnApp() {
         // props update interval
         if (fetcher.state != "idle" || fetcher.data != null) return
         if (!location[0] || !location[1]) return
-        console.log(location)
         fetcher.submit({ status, long: location[0], lat: location[1] }, { method: "POST" })
     }, [fetcher, status, location])
 
@@ -110,6 +132,9 @@ export default function WhosOnApp() {
             setFriends(refreshData.friends)
             setPending(refreshData.pending)
             setRequests(refreshData.requests)
+            setChats(refreshData.chats)
+            setUnreadChats(refreshData.unreadChats)
+            setUnreadCounts(refreshData.unreadCounts)
         }
     }, [refreshData, refreshError])
 
@@ -264,12 +289,17 @@ export default function WhosOnApp() {
                     </ProfilePicture>
                 </NavigationBar>
 
-                <div className="pointer-events-auto mx-5 mb-3 flex h-full w-1/4 flex-col rounded-xl bg-gray-50 px-6 py-4 shadow-lg ring-1 ring-gray-700 ring-opacity-20">
+                <div className="pointer-events-auto mx-5 mb-3 flex h-full w-1/2 flex-col rounded-xl bg-gray-50 px-6 py-4 shadow-lg ring-1 ring-gray-700 ring-opacity-20 lg:w-1/3 xl:w-1/4">
                     <Outlet
                         context={{
                             friends,
                             pending,
                             requests,
+                            user,
+                            chats,
+                            location,
+                            unreadChats,
+                            unreadCounts,
                             forceRefresh: () => {
                                 fetcher.submit(
                                     { status, long: location[0], lat: location[1] },
