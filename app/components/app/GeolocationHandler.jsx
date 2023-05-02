@@ -1,13 +1,22 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useMap } from "react-map-gl"
+
+const options = {
+    enableHighAccuracy: false,
+    timeout: 5000,
+}
 
 export default function GeolocationHandler({ setLocation }) {
     const map = useMap()
 
-    const options = {
-        enableHighAccuracy: false,
-        timeout: 5000,
-    }
+    const [l, setL] = useState([null, null])
+    const [oldUpdateTime, setOldUpdateTime] = useState(0)
+
+    useEffect(() => {
+        if (Date.now() - oldUpdateTime < 1000 * 6) return
+        setLocation(l)
+        setOldUpdateTime(Date.now())
+    }, [l, oldUpdateTime, setLocation])
 
     useEffect(() => {
         let firstGeoUpdate = true
@@ -18,9 +27,9 @@ export default function GeolocationHandler({ setLocation }) {
 
         function handleUpdate(pos) {
             let { latitude: lat, longitude: long } = pos?.coords || {}
-            console.log(lat, long)
             if (firstGeoUpdate) {
                 firstGeoUpdate = false
+                setLocation([long, lat])
                 map.current.flyTo({
                     center: [long, lat],
                     zoom: 16,
@@ -28,7 +37,7 @@ export default function GeolocationHandler({ setLocation }) {
                     curve: 1,
                 })
             }
-            setLocation([long, lat])
+            setL([long, lat])
         }
 
         async function handleError(err) {

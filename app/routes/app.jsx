@@ -87,9 +87,8 @@ export default function WhosOnApp() {
         // automatic update interval
         let updateInterval = null
         let handler = () => {
-            updateInterval = setTimeout(handler, 1000 * 10) // 10 seconds
+            updateInterval = setTimeout(handler, 1000 * 4) // 10 seconds
             if (!location[0] || !location[1]) return
-            console.log(location)
             fetcher.submit({ status, long: location[0], lat: location[1] }, { method: "POST" })
         }
 
@@ -103,7 +102,6 @@ export default function WhosOnApp() {
         // props update interval
         if (fetcher.state != "idle" || fetcher.data != null) return
         if (!location[0] || !location[1]) return
-        console.log(location)
         fetcher.submit({ status, long: location[0], lat: location[1] }, { method: "POST" })
     }, [fetcher, status, location])
 
