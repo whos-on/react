@@ -24,6 +24,8 @@ export const loader = async ({ request }) => {
     let user = await whoson.user.current(request)
     if (!user) throw redirect("/login")
 
+    if (!whoson.user.isVerified(user)) throw redirect("/verification")
+
     return json({ user })
 }
 

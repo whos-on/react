@@ -1,6 +1,6 @@
 import { Form } from "@remix-run/react"
 
-export default function AuthScreen({ title, altLink, altText, children }) {
+export default function AuthScreen({ title, altLink, altText, children, disableFooter }) {
     return (
         <div className="flex h-full min-h-screen w-full flex-col bg-[url('/images/authbg.png')] bg-cover bg-no-repeat">
             <div className="flex h-full max-h-screen min-h-screen w-full flex-col bg-black bg-opacity-40">
@@ -21,20 +21,30 @@ export default function AuthScreen({ title, altLink, altText, children }) {
                             {title}
                         </h1>
                         <p className="w-full text-center text-gray-900/80">
-                            Or{" "}
-                            <a className="text-primary/80 hover:text-primary/100" href={altLink}>
-                                {altText}
-                            </a>
+                            {altLink ? (
+                                <>
+                                    Or{" "}
+                                    <a
+                                        className="text-primary/80 hover:text-primary/100"
+                                        href={altLink}>
+                                        {altText}
+                                    </a>
+                                </>
+                            ) : (
+                                altText
+                            )}
                         </p>
 
                         <Form method="post" className="mt-8 flex flex-col space-y-4">
                             {children}
-                            <p className="mx-auto pt-2 font-sans text-2xs font-medium text-gray-900/50">
-                                By authenticating, you agree to our{" "}
-                                <a href="/tos" className="underline">
-                                    Terms and Conditions
-                                </a>
-                            </p>
+                            {!disableFooter && (
+                                <p className="mx-auto pt-2 font-sans text-2xs font-medium text-gray-900/50">
+                                    By authenticating, you agree to our{" "}
+                                    <a href="/tos" className="underline">
+                                        Terms and Conditions
+                                    </a>
+                                </p>
+                            )}
                         </Form>
                     </div>
                 </div>
