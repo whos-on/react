@@ -300,6 +300,32 @@ const api = {
             else if (res.status == 400) return apiError(res, await res.json())
             else if (res.status == 200) return apiSuccess(res, (await res.json())?.friends)
             else return apiError(res, "Unknown error")
+        },
+
+        remove: async (req, username) => {
+            if (!username) return apiError(req, "Missing username")
+
+            let user = await api.user.current(req)
+            if (!user) return null
+
+            let { data: removed, error: removedError } = await api.user.info(req, { username })
+
+            if (removedError) return apiError(req, removedError)
+
+            let res = await fetch(url("/api/friend/removeFriend/"), {
+                method: "PUT",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    id: user.id,
+                    removed: removed.id,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 404) return apiError(res, "User not found")
+            else if (res.status == 400) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
         }
     },
 }

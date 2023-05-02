@@ -1,5 +1,5 @@
 import { Link, useOutletContext } from "@remix-run/react"
-import { ArrowRightIcon, Frown, UsersIcon } from "lucide-react"
+import { ArrowRightIcon, Frown, PlusIcon, SearchIcon, UsersIcon } from "lucide-react"
 import BackgroundFiller from "~/components/app/BackgroundFiller"
 import Header from "~/components/app/Header"
 
@@ -12,7 +12,23 @@ export default function Chats() {
 
     return (
         <>
-            <Header title="Chats" />
+            <Header
+                title="Chats"
+                actions={[
+                    {
+                        icon: PlusIcon,
+                        to: "/app/new",
+                    },
+                    {
+                        icon: UsersIcon,
+                        to: "/app/friends",
+                    },
+                    {
+                        icon: SearchIcon,
+                        to: "/app/search",
+                    },
+                ]}
+            />
             {!!requests?.length && (
                 <Link
                     to="/app/requests"

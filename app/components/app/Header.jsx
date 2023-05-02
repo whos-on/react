@@ -1,28 +1,22 @@
 import { Link } from "@remix-run/react"
-import { ArrowLeftIcon, PlusIcon, SearchIcon, UserPlusIcon } from "lucide-react"
+import { ArrowLeftIcon } from "lucide-react"
 
-export default function Header({ title = "No title provided :(", back = false }) {
+export default function Header({ title = "No title provided :(", back = false, actions }) {
     return (
         <div className="mb-4 flex flex-row">
             {back && (
-                <Link className="my-auto mr-2 p-1" to="/app">
+                <Link className="my-auto mr-2 p-1" to={typeof back == "string" ? back : "/app"}>
                     <ArrowLeftIcon className="h-4 w-4 stroke-2 text-gray-900/80" />
                 </Link>
             )}
             <h1 className="text-left font-sans text-2xl font-extrabold tracking-tight">{title}</h1>
-            {!back && (
-                <>
-                    <Link className="my-auto ml-auto p-1" to="/app/new">
-                        <PlusIcon className="h-4 w-4 stroke-2 text-gray-900/80" />
+            <div className="ml-auto flex flex-row space-x-3">
+                {actions?.map(({ icon: Icon, to }, i) => (
+                    <Link key={i} className="group my-auto p-1" to={to}>
+                        <Icon className="h-4 w-4 stroke-2 text-gray-900/70 group-hover:text-gray-900/100" />
                     </Link>
-                    <Link className="my-auto ml-2 p-1" to="/app/add">
-                        <UserPlusIcon className="h-4 w-4 stroke-2 text-gray-900/80" />
-                    </Link>
-                    <Link className="my-auto ml-2 p-1" to="/app/search">
-                        <SearchIcon className="h-4 w-4 stroke-2 text-gray-900/80" />
-                    </Link>
-                </>
-            )}
+                ))}
+            </div>
         </div>
     )
 }
