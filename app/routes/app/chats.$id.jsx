@@ -1,5 +1,5 @@
 import whoson from "~/utils/whoson"
-import { SendIcon } from "lucide-react"
+import { SendIcon, SettingsIcon } from "lucide-react"
 import { json, redirect } from "@remix-run/cloudflare"
 import { Form, useActionData, useLoaderData, useOutletContext } from "@remix-run/react"
 import Header from "~/components/app/Header"
@@ -80,8 +80,6 @@ export default function NewChat() {
                 if (!chatInfo) return "Loading..."
                 let list = chatInfo.people.filter(p => p._id != user.id)
 
-                console.log(list)
-
                 if (list.length == 0) return "You"
                 else if (list.length == 1) return `${list[0].firstName} ${list[0].lastName}`
 
@@ -95,7 +93,16 @@ export default function NewChat() {
 
     return (
         <div className="flex h-full w-full flex-col">
-            <Header title={chatTitle} back={true} />
+            <Header
+                title={chatTitle}
+                back={true}
+                actions={[
+                    {
+                        icon: SettingsIcon,
+                        to: `/app/chats/${chatInfo.id}/settings`,
+                    },
+                ]}
+            />
             <Form className="flex h-full w-full flex-col" method="post">
                 {newChatError && (
                     <div className="mt-1 flex w-full flex-row text-center font-sans text-xs font-semibold text-red-500">
