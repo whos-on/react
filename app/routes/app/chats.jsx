@@ -17,7 +17,7 @@ export default function Chats() {
                 actions={[
                     {
                         icon: PlusIcon,
-                        to: "/app/new",
+                        to: "/app/chats/new",
                     },
                     {
                         icon: UsersIcon,
