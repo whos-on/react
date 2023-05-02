@@ -1,6 +1,13 @@
 import { Form } from "@remix-run/react"
 
-export default function AuthScreen({ title, altLink, altText, children, disableFooter }) {
+export default function AuthScreen({
+    title,
+    altLink,
+    altText,
+    children,
+    disableFooter,
+    showReset,
+}) {
     return (
         <div className="flex h-full min-h-screen w-full flex-col bg-[url('/images/authbg.png')] bg-cover bg-no-repeat">
             <div className="flex h-full max-h-screen min-h-screen w-full flex-col bg-black bg-opacity-40">
@@ -20,7 +27,7 @@ export default function AuthScreen({ title, altLink, altText, children, disableF
                         <h1 className="text-center font-sans text-3xl font-extrabold tracking-tight text-gray-900">
                             {title}
                         </h1>
-                        <p className="w-full text-center text-gray-900/80">
+                        <p className="mt-2 w-full text-center text-gray-900/80">
                             {altLink ? (
                                 <>
                                     Or{" "}
@@ -37,6 +44,13 @@ export default function AuthScreen({ title, altLink, altText, children, disableF
 
                         <Form method="post" className="mt-8 flex flex-col space-y-4">
                             {children}
+                            {showReset && (
+                                <a
+                                    href="/resetpassword"
+                                    className="mx-auto pt-2 font-sans text-xs font-medium text-green-500 opacity-80 hover:opacity-100">
+                                    Forgot password?
+                                </a>
+                            )}
                             {!disableFooter && (
                                 <p className="mx-auto pt-2 font-sans text-2xs font-medium text-gray-900/50">
                                     By authenticating, you agree to our{" "}
