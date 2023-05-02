@@ -103,7 +103,7 @@ export default function NewChat() {
                     </div>
                 )}
                 <div className="flex h-full flex-col space-y-1 overflow-y-scroll">
-                    {messages?.map((message, i) => {
+                    {messages.map((message, i) => {
                         let dt = new Date(message.timestamp)
                         let time = `${dt.getHours() % 12}:${dt
                             .getMinutes()
