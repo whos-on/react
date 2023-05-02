@@ -300,8 +300,209 @@ const api = {
             else if (res.status == 400) return apiError(res, await res.json())
             else if (res.status == 200) return apiSuccess(res, (await res.json())?.friends)
             else return apiError(res, "Unknown error")
+        },
+
+        remove: async (req, username) => {
+            if (!username) return apiError(req, "Missing username")
+
+            let user = await api.user.current(req)
+            if (!user) return null
+
+            let { data: removed, error: removedError } = await api.user.info(req, { username })
+
+            if (removedError) return apiError(req, removedError)
+
+            let res = await fetch(url("/api/friend/removeFriend/"), {
+                method: "PUT",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    id: user.id,
+                    removed: removed.id,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 404) return apiError(res, "User not found")
+            else if (res.status == 400) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
         }
     },
+
+    chat: {
+        create: async (req, users, message) => {
+            if (!users) return apiError(req, "Missing users")
+            if (typeof users == "string") users = [users]
+            if (!Array.isArray(users)) return apiError(req, "Users must be an array or string")
+            if (!message) return apiError(req, "Missing starting message")
+
+            let user = await api.user.current(req)
+            if (!user) return null
+
+            let res = await fetch(url("/api/chat/create/"), {
+                method: "POST",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    users: [user.username, ...users],
+                    message,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 404) return apiError(res, "User not found")
+            else if (res.status == 400) return apiError(res, await res.json())
+            else if (res.status == 201) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
+        },
+
+        getMessages: async (req, chatID) => {
+            if (!chatID) return apiError(req, "Missing chat ID")
+
+            let user = await api.user.current(req)
+            if (!user) return null
+
+            let res = await fetch(url("/api/chat/getMessage/"), {
+                method: "POST",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    chatID,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 404) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
+        },
+
+        info: async (req, chatID) => {
+            if (!chatID) return apiError(req, "Missing chat ID")
+
+            let user = await api.user.current(req)
+            if (!user) return null
+
+            let res = await fetch(url("/api/chat/info/"), {
+                method: "POST",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    chatID,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 400) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
+        },
+
+        send: async (req, chatID, message) => {
+            if (!chatID) return apiError(req, "Missing chat ID")
+            if (!message) return apiError(req, "Missing message")
+
+            let user = await api.user.current(req)
+            if (!user) return null
+
+            let res = await fetch(url("/api/chat/sendMessage/"), {
+                method: "POST",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    id: chatID,
+                    sender: user.username,
+                    message,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 404) return apiError(res, await res.json())
+            else if (res.status == 403) return apiError(res, await res.json())
+            else if (res.status == 400) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
+        },
+
+        list: async (req) => {
+            let user = await api.user.current(req)
+            if (!user) return null
+
+            let res = await fetch(url("/api/chat/get/"), {
+                method: "POST",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    id: user.id,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 404) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
+        },
+
+        refreshAll: async (req) => {
+            let user = await api.user.current(req)
+            if (!user) return null
+
+            let res = await fetch(url("/api/chat/refreshmessages/"), {
+                method: "POST",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    userId: user.id,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 404) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
+        },
+
+        leave: async (req, chatId) => {
+            if (!chatId) return apiError(req, "Missing chat ID")
+
+            let user = await api.user.current(req)
+            if (!user) return null
+
+            let res = await fetch(url("/api/chat/leave/"), {
+                method: "POST",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    chatId,
+                    userId: user.id,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 404) return apiError(res, await res.json())
+            else if (res.status == 403) return apiError(res, await res.json())
+            else if (res.status == 400) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
+        },
+
+        search: async (req, query) => {
+            if (!query) return apiError(req, "Missing query")
+
+            let user = await api.user.current(req)
+            if (!user) return null
+
+            let res = await fetch(url("/api/chat/search/"), {
+                method: "POST",
+                headers: api.constants.HEADERS,
+                body: JSON.stringify({
+                    search: query,
+                    id: user.id,
+                })
+            })
+
+            if (res.status >= 500) return apiError(res, "Server error")
+            else if (res.status == 404) return apiError(res, await res.json())
+            else if (res.status == 400) return apiError(res, await res.json())
+            else if (res.status == 200) return apiSuccess(res, await res.json())
+            else return apiError(res, "Unknown error")
+
+        },
+
+    }
 }
 
 export default api

@@ -15,6 +15,14 @@ export default function ProfilePicture({
 
     const Container = onClick ? "button" : "div"
 
+    const statusBg = !whoson.user.isOnline(user)
+        ? "bg-transparent border-transparent"
+        : user?.status == whoson.constants.statuses.AVAILABLE
+        ? "bg-green-500 border-gray-50"
+        : user?.status == whoson.constants.statuses.BUSY
+        ? "bg-amber-500 border-gray-50"
+        : "bg-transparent border-transparent"
+
     return (
         <div className={`relative flex-shrink-0 flex-grow-0 ${className}`} {...props}>
             <Container
@@ -28,13 +36,7 @@ export default function ProfilePicture({
             </Container>
             {showStatus && (
                 <div
-                    className={`absolute left-0 bottom-0 box-content h-3 w-3 rounded-full border-t-2 border-r-2 border-gray-50 ${
-                        user?.status == whoson.constants.statuses.AVAILABLE
-                            ? "bg-green-500"
-                            : user?.status == whoson.constants.statuses.BUSY
-                            ? "bg-amber-500"
-                            : "opacity-0"
-                    }`}></div>
+                    className={`absolute left-0 bottom-0 box-content h-3 w-3 rounded-full border-t-2 border-r-2 border-gray-50 ${statusBg}`}></div>
             )}
             {children}
         </div>
